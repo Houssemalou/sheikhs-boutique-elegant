@@ -12,9 +12,11 @@ import { Category, Product } from '@/types';
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 30000]);
+  const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high'>('name');
   const { language } = useShop();
 
-  // Group products by category and apply search filter
+  // Group products by category and apply search and price filters
   const groupedProducts = useMemo(() => {
     let filteredProducts = products;
 
@@ -27,6 +29,24 @@ const Index = () => {
       );
     }
 
+    // Filter by price range
+    filteredProducts = filteredProducts.filter(product => 
+      product.price >= priceRange[0] && product.price <= priceRange[1]
+    );
+
+    // Sort products
+    filteredProducts.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'name':
+        default:
+          return a.name[language].localeCompare(b.name[language]);
+      }
+    });
+
     // Group by category
     const grouped: Record<string, Product[]> = {};
     categories.forEach(category => {
@@ -36,7 +56,7 @@ const Index = () => {
     });
 
     return grouped;
-  }, [searchQuery, language]);
+  }, [searchQuery, language, priceRange, sortBy]);
 
   const handleProductClick = (product: Product) => {
     // TODO: Implement product detail modal or navigation
@@ -86,6 +106,73 @@ const Index = () => {
                   }
                 </p>
               )}
+            </div>
+
+            {/* Filters */}
+            <div className="mb-8 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:space-x-6">
+              {/* Price Range Filter */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-2">
+                  {language === 'fr' ? 'Fourchette de prix' : 'نطاق السعر'}
+                </label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={priceRange[0]}
+                    onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                    className="w-24 px-3 py-2 border border-border rounded-md text-sm"
+                  />
+                  <span className="text-muted-foreground">-</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 30000])}
+                    className="w-24 px-3 py-2 border border-border rounded-md text-sm"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {language === 'fr' ? 'DH' : 'درهم'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Sort Options */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-2">
+                  {language === 'fr' ? 'Trier par' : 'ترتيب حسب'}
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'name' | 'price-low' | 'price-high')}
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm bg-background"
+                >
+                  <option value="name">
+                    {language === 'fr' ? 'Nom' : 'الاسم'}
+                  </option>
+                  <option value="price-low">
+                    {language === 'fr' ? 'Prix croissant' : 'السعر من الأقل للأعلى'}
+                  </option>
+                  <option value="price-high">
+                    {language === 'fr' ? 'Prix décroissant' : 'السعر من الأعلى للأقل'}
+                  </option>
+                </select>
+              </div>
+
+              {/* Reset Filters */}
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => {
+                    setPriceRange([0, 30000]);
+                    setSortBy('name');
+                    setSearchQuery('');
+                    setActiveCategory('all');
+                  }}
+                  className="px-4 py-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  {language === 'fr' ? 'Réinitialiser' : 'إعادة تعيين'}
+                </button>
+              </div>
             </div>
 
             {/* Products by Category */}
