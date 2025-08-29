@@ -38,7 +38,7 @@ export interface OrderData {
     city: string;
   };
   shippingMethod: 'standard' | 'express';
-  paymentMethod: 'cash' | 'card';
+  paymentMethod: 'cash';
 }
 
 export type Language = 'fr' | 'ar';

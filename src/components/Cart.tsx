@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { useShop } from '@/contexts/ShopContext';
+import { useState, useEffect } from 'react';
+import { OrderForm } from './OrderForm';
 
 export function Cart() {
   const {
@@ -17,6 +19,7 @@ export function Cart() {
     language,
     t,
   } = useShop();
+  const [checkoutMode, setCheckoutMode] = useState(false);
 
   const formatPrice = (price: number) => {
     return `${price.toLocaleString()} ${t('currency')}`;
@@ -25,6 +28,11 @@ export function Cart() {
   const shippingThreshold = 500;
   const currentTotal = getCartTotal();
   const freeShippingRemaining = Math.max(0, shippingThreshold - currentTotal);
+
+  // Whenever the cart sidebar opens, ensure we show the cart (not the checkout form)
+  useEffect(() => {
+    if (isCartOpen) setCheckoutMode(false);
+  }, [isCartOpen]);
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
@@ -69,6 +77,7 @@ export function Cart() {
                   </div>
                 </div>
               )}
+              <Separator className="my-4" />
 
               {/* Cart Items */}
               <div className="flex-1 overflow-auto space-y-4">
@@ -135,50 +144,59 @@ export function Cart() {
                   </div>
                 ))}
               </div>
-
+              
               <Separator className="my-4" />
 
-              {/* Cart Summary */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">{t('total')}</span>
-                  <span className="font-bold text-lg">
-                    {formatPrice(currentTotal)}
-                  </span>
-                </div>
+              {/* If checkoutMode: show form first, then order summary below; otherwise show summary/buttons below products */}
+              {checkoutMode ? (
+                <div>
+                  <OrderForm inline onCancel={() => setCheckoutMode(false)} />
 
-                {currentTotal >= shippingThreshold && (
-                  <div className="flex items-center justify-center gap-2 text-sm text-success font-medium">
-                    <Badge variant="outline" className="text-success border-success">
-                      {t('free-shipping')}
-                    </Badge>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">{t('order-summary') || t('total')}</span>
+                      <span className="font-bold text-lg">{formatPrice(currentTotal)}</span>
+                    </div>
+                    <div className="space-y-2">
+                      <Button className="w-full" size="lg" onClick={() => {/* already submitting in OrderForm */}}>
+                        {t('submit-order') || t('checkout')}
+                      </Button>
+                      <Button variant="outline" className="w-full" onClick={() => setCheckoutMode(false)}>
+                        {language === 'fr' ? 'Retour' : 'العودة'}
+                      </Button>
+                    </div>
                   </div>
-                )}
-
-                <div className="space-y-2">
-                  <Button className="w-full" size="lg">
-                    {t('checkout')}
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setCartOpen(false)}
-                  >
-                    {t('continue-shopping')}
-                  </Button>
-                  
-                  {cartItems.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      className="w-full text-muted-foreground"
-                      onClick={clearCart}
-                    >
-                      {language === 'fr' ? 'Vider le panier' : 'إفراغ السلة'}
-                    </Button>
-                  )}
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">{t('total')}</span>
+                    <span className="font-bold text-lg">{formatPrice(currentTotal)}</span>
+                  </div>
+
+                  {currentTotal >= shippingThreshold && (
+                    <div className="flex items-center justify-center gap-2 text-sm text-success font-medium">
+                      <Badge variant="outline" className="text-success border-success">
+                        {t('free-shipping')}
+                      </Badge>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Button className="w-full" size="lg" onClick={() => setCheckoutMode(true)}>
+                      {t('checkout')}
+                    </Button>
+                    <Button variant="outline" className="w-full" onClick={() => setCartOpen(false)}>
+                      {t('continue-shopping')}
+                    </Button>
+                    {cartItems.length > 1 && (
+                      <Button variant="ghost" className="w-full text-muted-foreground" onClick={clearCart}>
+                        {language === 'fr' ? 'Vider le panier' : 'إفراغ السلة'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

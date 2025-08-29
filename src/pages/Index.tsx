@@ -225,10 +225,7 @@ const Index = () => {
               </div>
             )}
 
-            {/* Order Form */}
-            <div className="mt-16 text-center">
-              <OrderForm />
-            </div>
+            {/* Order form removed from homepage - checkout available from cart sidebar */}
           </div>
         </section>
       </main>

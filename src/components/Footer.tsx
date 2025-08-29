@@ -17,8 +17,8 @@ export function Footer() {
     },
     {
       icon: Shield,
-      title: { fr: 'Paiement Sécurisé', ar: 'دفع آمن' },
-      description: { fr: 'Protection SSL garantie', ar: 'حماية SSL مضمونة' }
+      title: { fr: 'Paiement à la livraison', ar: 'الدفع عند التسليم' },
+      description: { fr: 'Paiement en espèces uniquement lors de la livraison', ar: 'الدفع نقدًا فقط عند التسليم' }
     },
     {
       icon: Headphones,
@@ -31,7 +31,7 @@ export function Footer() {
     fr: {
       title: 'Sheikh Store',
       description: 'Votre destination de confiance pour l\'électronique, cosmétiques et mode premium.',
-      address: '123 Rue Mohammed V, Casablanca',
+      address: 'Qatar',
       phone: '+212 522 123 456',
       email: 'contact@shekhstore.ma',
       hours: 'Lun-Ven: 9h-19h, Sam: 9h-18h'
@@ -149,12 +149,10 @@ export function Footer() {
               © 2024 Sheikh Store. {language === 'fr' ? 'Tous droits réservés.' : 'جميع الحقوق محفوظة.'}
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>{language === 'fr' ? 'Paiement accepté:' : 'طرق الدفع المقبولة:'}</span>
+              <span>{language === 'fr' ? 'Mode de paiement:' : 'طريقة الدفع:'}</span>
               <div className="flex gap-2">
-                <div className="px-2 py-1 bg-background rounded text-xs font-medium">VISA</div>
-                <div className="px-2 py-1 bg-background rounded text-xs font-medium">MC</div>
                 <div className="px-2 py-1 bg-background rounded text-xs font-medium">
-                  {language === 'fr' ? 'Espèces' : 'نقدي'}
+                  {language === 'fr' ? "Espèces à la livraison" : 'الدفع نقدًا عند التسليم'}
                 </div>
               </div>
             </div>

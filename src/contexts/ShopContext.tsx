@@ -131,6 +131,8 @@ const translations = {
     '24h-support': 'Support 24h/24',
     'easy-returns': 'Retours faciles',
     'product-added': 'Produit ajouté au panier',
+  'show-more': 'Voir plus',
+  'show-less': 'Voir moins',
   },
   ar: {
     'add-to-cart': 'أضف إلى السلة',
@@ -155,6 +157,8 @@ const translations = {
     '24h-support': 'دعم ٢٤/٧',
     'easy-returns': 'إرجاع سهل',
     'product-added': 'تم إضافة المنتج إلى السلة',
+  'show-more': 'عرض المزيد',
+  'show-less': 'عرض أقل',
   },
 };
 

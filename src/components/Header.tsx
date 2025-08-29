@@ -15,7 +15,7 @@ interface HeaderProps {
 }
 
 export function Header({ selectedCategory, onCategoryChange, searchQuery, onSearchChange }: HeaderProps) {
-  const { language, setLanguage, toggleCart, getCartItemsCount, t } = useShop();
+  const { language, setLanguage, toggleCart, getCartItemsCount, t, setCartOpen } = useShop();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const cartItemsCount = getCartItemsCount();
@@ -76,7 +76,7 @@ export function Header({ selectedCategory, onCategoryChange, searchQuery, onSear
             <Button
               variant="ghost"
               size="sm"
-              onClick={toggleCart}
+              onClick={() => { setCartOpen(true); setIsMobileMenuOpen(false); }}
               className="relative"
             >
               <ShoppingCart className="h-5 w-5" />

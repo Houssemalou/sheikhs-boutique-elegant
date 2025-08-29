@@ -4,6 +4,35 @@
 
 /* Sheikh Store E-commerce Design System */
 
+/* Product Grid Layout */
+.product-grid {
+  display: grid;
+  gap: 1rem;
+  /* Par défaut (mobile) : 1 produit par ligne */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Petits appareils (sm) : 2 produits par ligne */
+@media (min-width: 640px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Moyens appareils (md) : 3 produits par ligne */
+@media (min-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Grands appareils (lg) : 4 produits par ligne */
+@media (min-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 @layer base {
   :root {
     /* Brand Colors */
