@@ -35,10 +35,10 @@ export function Header({ selectedCategory, onCategoryChange, searchQuery, onSear
               <button
                 key={category.id}
                 onClick={() => onCategoryChange(category.id as Category)}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors hover:text-primary ${
                   selectedCategory === category.id
-                    ? 'text-primary border-b-2 border-primary pb-1'
-                    : 'text-muted-foreground'
+                    ? 'bg-foreground text-background'
+                    : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
                 {category.name[language]}
@@ -125,7 +125,7 @@ export function Header({ selectedCategory, onCategoryChange, searchQuery, onSear
                     }}
                     className={`text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       selectedCategory === category.id
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-foreground text-background'
                         : 'text-muted-foreground hover:text-primary hover:bg-muted'
                     }`}
                   >
