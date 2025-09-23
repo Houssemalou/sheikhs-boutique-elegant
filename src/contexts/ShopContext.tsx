@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { CartItem, Language, Product } from '@/types';
+import { Language,} from '@/types';
 import { toast } from '@/hooks/use-toast';
+import { ProductDTO, CartItem } from '@/models/types';
 
 interface ShopState {
   cartItems: CartItem[];
@@ -9,9 +10,9 @@ interface ShopState {
 }
 
 type ShopAction =
-  | { type: 'ADD_TO_CART'; payload: { product: Product; quantity?: number; selectedColor?: string } }
-  | { type: 'REMOVE_FROM_CART'; payload: string }
-  | { type: 'UPDATE_QUANTITY'; payload: { productId: string; quantity: number } }
+  | { type: 'ADD_TO_CART'; payload: { product: ProductDTO; quantity?: number; selectedColor?: string } }
+  | { type: 'REMOVE_FROM_CART'; payload: any }
+  | { type: 'UPDATE_QUANTITY'; payload: { productId: number; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'SET_LANGUAGE'; payload: Language }
   | { type: 'TOGGLE_CART' }
@@ -20,7 +21,7 @@ type ShopAction =
 
 const initialState: ShopState = {
   cartItems: [],
-  language: 'fr',
+  language: 'ar',
   isCartOpen: false,
 };
 
@@ -93,9 +94,9 @@ function shopReducer(state: ShopState, action: ShopAction): ShopState {
 }
 
 interface ShopContextType extends ShopState {
-  addToCart: (product: Product, quantity?: number, selectedColor?: string) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: ProductDTO, quantity?: number, selectedColor?: string) => void;
+  removeFromCart: (productId: any) => void;
+  updateQuantity: (productId: any, quantity: number) => void;
   clearCart: () => void;
   setLanguage: (language: Language) => void;
   toggleCart: () => void;
@@ -135,7 +136,7 @@ const translations = {
   'show-less': 'Voir moins',
   },
   ar: {
-    'add-to-cart': 'أضف إلى السلة',
+    'add-to-cart': 'أضف إلى السلة(Add to Cart)',
     'view-cart': 'عرض السلة',
     'checkout': 'الدفع',
     'cart-empty': 'سلتك فارغة',
@@ -149,7 +150,7 @@ const translations = {
     'home': 'المنزل',
     'all-categories': 'جميع الفئات',
     'search': 'بحث...',
-    'currency': 'درهم',
+    'currency': 'ر.ق',
     'in-stock': 'متوفر',
     'out-of-stock': 'نفد من المخزون',
     'free-shipping': 'شحن مجاني',
@@ -195,7 +196,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.setAttribute('lang', state.language);
   }, [state.language]);
 
-  const addToCart = (product: Product, quantity = 1, selectedColor?: string) => {
+  const addToCart = (product: ProductDTO, quantity = 1, selectedColor?: string) => {
     dispatch({ type: 'ADD_TO_CART', payload: { product, quantity, selectedColor } });
     toast({
       title: translations[state.language]['product-added'],
@@ -207,7 +208,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: any, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
   };
 

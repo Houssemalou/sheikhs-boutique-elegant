@@ -1,11 +1,14 @@
-import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Separator } from '@/components/ui/separator';
-import { useShop } from '@/contexts/ShopContext';
-import { useState, useEffect } from 'react';
-import { OrderForm } from './OrderForm';
+import { X, Minus, Plus, ShoppingBag, Trash2, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { useShop } from "@/contexts/ShopContext";
+import { useState, useEffect } from "react";
+import { OrderForm } from "./OrderForm";
+import { useMutation } from "@tanstack/react-query";
+import { createOrder } from "@/services/orderService";
+import { CustomerInfo } from "@/models/types";
 
 export function Cart() {
   const {
@@ -16,23 +19,50 @@ export function Cart() {
     removeFromCart,
     clearCart,
     getCartTotal,
-    language,
     t,
   } = useShop();
+
   const [checkoutMode, setCheckoutMode] = useState(false);
 
   const formatPrice = (price: number) => {
-    return `${price.toLocaleString()} ${t('currency')}`;
+    return `${price.toLocaleString()} ر.ق`; // ✅ remplacer par ر.ق
   };
 
-  const shippingThreshold = 500;
+  // Livraison toujours gratuite → on retire toute logique de seuil/progress bar
   const currentTotal = getCartTotal();
-  const freeShippingRemaining = Math.max(0, shippingThreshold - currentTotal);
 
-  // Whenever the cart sidebar opens, ensure we show the cart (not the checkout form)
   useEffect(() => {
     if (isCartOpen) setCheckoutMode(false);
   }, [isCartOpen]);
+
+  // Mutation React Query
+  const {
+    mutate: submitOrder,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+  } = useMutation({
+    mutationFn: createOrder,
+    onSuccess: () => {
+      clearCart();
+      setCartOpen(false);
+    },
+  });
+
+  // Construire OrderData depuis le panier
+  const handleOrderSubmit = (customerInfo: CustomerInfo) => {
+    const order = {
+      items: cartItems.map((item) => ({
+        productName: item.product.name,
+        quantity: item.quantity,
+      })),
+      total: currentTotal,
+      // ✅ correspond exactement à l'interface OrderData (propriété "CustomerInfo")
+      customerInfo: customerInfo,
+    };
+    submitOrder(order);
+  };
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setCartOpen}>
@@ -40,7 +70,7 @@ export function Cart() {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
-            {t('view-cart')}
+            {t("view-cart")}
             {cartItems.length > 0 && (
               <Badge variant="secondary">{cartItems.length}</Badge>
             )}
@@ -51,80 +81,64 @@ export function Cart() {
           {cartItems.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
               <ShoppingBag className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">{t('cart-empty')}</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("cart-empty")}</h3>
               <Button onClick={() => setCartOpen(false)} variant="outline">
-                {t('continue-shopping')}
+                {t("continue-shopping")}
               </Button>
             </div>
           ) : (
             <>
-              {/* Free Shipping Progress */}
-              {freeShippingRemaining > 0 && (
-                <div className="mb-4 p-3 bg-primary-light rounded-lg">
-                  <div className="text-sm text-primary font-medium mb-2">
-                    {language === 'fr' 
-                      ? `Ajoutez ${formatPrice(freeShippingRemaining)} pour la livraison gratuite!`
-                      : `أضف ${formatPrice(freeShippingRemaining)} للشحن المجاني!`
-                    }
-                  </div>
-                  <div className="w-full bg-background rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all"
-                      style={{ 
-                        width: `${Math.min(100, (currentTotal / shippingThreshold) * 100)}%` 
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
+              {/* ⛔ Progress bar supprimée (toujours Free Shipping) */}
+
               <Separator className="my-4" />
 
               {/* Cart Items */}
               <div className="flex-1 overflow-auto space-y-4">
                 {cartItems.map((item) => (
-                  <div key={`${item.product.id}-${item.selectedColor}`} className="flex gap-3">
+                  <div
+                    key={`${item.product.id}-${item.selectedColor}`}
+                    className="flex gap-3"
+                  >
                     <img
-                      src={item.product.image}
-                      alt={item.product.name[language]}
+                      src={item.product.photoPath}
+                      alt={item.product.name}
                       className="w-16 h-16 object-cover rounded-md"
                     />
-                    
+
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-sm line-clamp-2">
-                        {item.product.name[language]}
+                        {item.product.name}
                       </h4>
-                      
-                      {item.selectedColor && (
-                        <p className="text-xs text-muted-foreground">
-                          {language === 'fr' ? 'Couleur' : 'اللون'}: {item.selectedColor}
-                        </p>
-                      )}
-                      
+
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             className="h-8 w-8 p-0"
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(item.product.id, item.quantity - 1)
+                            }
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          
+
                           <span className="text-sm font-medium w-8 text-center">
                             {item.quantity}
                           </span>
-                          
+
                           <Button
                             variant="outline"
                             size="sm"
                             className="h-8 w-8 p-0"
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(item.product.id, item.quantity + 1)
+                            }
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
-                        
+
                         <Button
                           variant="ghost"
                           size="sm"
@@ -134,7 +148,7 @@ export function Cart() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      
+
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-sm font-semibold">
                           {formatPrice(item.product.price * item.quantity)}
@@ -144,54 +158,103 @@ export function Cart() {
                   </div>
                 ))}
               </div>
-              
+
               <Separator className="my-4" />
 
-              {/* If checkoutMode: show form first, then order summary below; otherwise show summary/buttons below products */}
               {checkoutMode ? (
                 <div>
-                  <OrderForm inline onCancel={() => setCheckoutMode(false)} />
+                  <OrderForm
+                    inline
+                    onCancel={() => setCheckoutMode(false)}
+                    onSubmit={handleOrderSubmit}
+                  />
 
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold">{t('order-summary') || t('total')}</span>
-                      <span className="font-bold text-lg">{formatPrice(currentTotal)}</span>
+                      <span className="font-semibold">
+                        {t("order-summary") || t("total")}
+                      </span>
+                      <span className="font-bold text-lg">
+                        {formatPrice(currentTotal)}
+                      </span>
                     </div>
                     <div className="space-y-2">
-                      <Button className="w-full" size="lg" onClick={() => {/* already submitting in OrderForm */}}>
-                        {t('submit-order') || t('checkout')}
+                      <Button
+                        className="w-full"
+                        size="lg"
+                        onClick={() => {}} // déjà géré dans OrderForm
+                        disabled={isPending}
+                      >
+                        {isPending ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          t("submit-order") || t("checkout") 
+                        )}
                       </Button>
-                      <Button variant="outline" className="w-full" onClick={() => setCheckoutMode(false)}>
-                        {language === 'fr' ? 'Retour' : 'العودة'}
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setCheckoutMode(false)}
+                      >
+                        {/* عربي + English */}
+                        العودة (Back)
                       </Button>
                     </div>
+
+                    {isError && (
+                      <p className="text-red-500 text-sm mt-2">
+                        {/* عربي + English */}
+                        {error?.message || "حدث خطأ أثناء الإرسال (Error while sending)"}
+                      </p>
+                    )}
+                    {isSuccess && (
+                      <p className="text-green-600 text-sm mt-2">
+                        {/* عربي + English */}
+                        ✅ تم إرسال الطلب بنجاح (Order sent successfully)
+                      </p>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold">{t('total')}</span>
-                    <span className="font-bold text-lg">{formatPrice(currentTotal)}</span>
+                    <span className="font-semibold">{t("total")}</span>
+                    <span className="font-bold text-lg">
+                      {formatPrice(currentTotal)}
+                    </span>
                   </div>
 
-                  {currentTotal >= shippingThreshold && (
-                    <div className="flex items-center justify-center gap-2 text-sm text-success font-medium">
-                      <Badge variant="outline" className="text-success border-success">
-                        {t('free-shipping')}
-                      </Badge>
-                    </div>
-                  )}
+                  {/* Afficher toujours la Badgé Free Shipping */}
+                  <div className="flex items-center justify-center gap-2 text-sm font-medium">
+                    <Badge variant="outline">
+                      {/* عربي + English */}
+                      الشحن مجاني (Free Shipping)
+                    </Badge>
+                  </div>
 
                   <div className="space-y-2">
-                    <Button className="w-full" size="lg" onClick={() => setCheckoutMode(true)}>
-                      {t('checkout')}
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      onClick={() => setCheckoutMode(true)}
+                    >
+                      {t("checkout")}
                     </Button>
-                    <Button variant="outline" className="w-full" onClick={() => setCartOpen(false)}>
-                      {t('continue-shopping')}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setCartOpen(false)}
+                    >
+                      {t("continue-shopping")}
                     </Button>
                     {cartItems.length > 1 && (
-                      <Button variant="ghost" className="w-full text-muted-foreground" onClick={clearCart}>
-                        {language === 'fr' ? 'Vider le panier' : 'إفراغ السلة'}
+                      <Button
+                        variant="ghost"
+                        className="w-full text-muted-foreground"
+                        onClick={clearCart}
+                      >
+                        {/* عربي + English */}
+                        إفراغ السلة (Empty Cart)
                       </Button>
                     )}
                   </div>

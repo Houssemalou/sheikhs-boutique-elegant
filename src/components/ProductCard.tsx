@@ -1,66 +1,69 @@
-import { Star, ShoppingCart, Heart, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { useShop } from '@/contexts/ShopContext';
-import { Product } from '@/types';
-import { useState } from 'react';
+import { ShoppingCart, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { useShop } from "@/contexts/ShopContext";
+import { ProductDTO } from "@/models/types";
+import { useState } from "react";
 
 interface ProductCardProps {
-  product: Product;
-  onProductClick?: (product: Product) => void;
+  product: ProductDTO;
 }
 
-export function ProductCard({ product, onProductClick }: ProductCardProps) {
-  const { addToCart, language, t } = useShop();
-  const [selectedColor, setSelectedColor] = useState<string | undefined>(
-    product.colors?.[0]
-  );
+export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart, t } = useShop();
   const [isLoading, setIsLoading] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsLoading(true);
-    
-    // Simulate network delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    addToCart(product, 1, selectedColor);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    addToCart(product, 1);
     setIsLoading(false);
   };
 
-  const formatPrice = (price: number) => {
-    return `${price.toLocaleString()} ${t('currency')}`;
-  };
+  const isPromo = product.discount !== 0;
+  const isOutOfStock = product.stock === 0;
 
   return (
-    <Card 
-      className="group cursor-pointer overflow-hidden h-full flex flex-col max-w-[220px]"
-      onClick={() => onProductClick?.(product)}
-    >
+    <Card className="group cursor-pointer overflow-hidden h-full flex flex-col max-w-[220px]">
       <div className="relative overflow-hidden aspect-square">
         <img
-          src={product.image}
-          alt={product.name[language]}
+          src={product.photoPath}
+          alt={product.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        
+
         {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
-          {product.originalPrice && (
-            <Badge className="bg-blue-600/90 text-white text-[10px] px-1.5 py-0">
-              -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-            </Badge>
+          {isPromo && (
+        <Badge className="bg-blue-600/90 text-white text-[10px] px-1.5 py-0">
+          -{Math.round(
+            ((product.originalPrice - product.price) /
+          product.originalPrice) *
+          100
           )}
-          {!product.inStock && (
-            <Badge variant="secondary" className="bg-muted/90 text-muted-foreground text-[10px] px-1.5 py-0">
-              {t('out-of-stock')}
+          %
+        </Badge>
+          )}
+          {isOutOfStock && (
+        <Badge className="bg-gray-600/90 text-white text-[10px] px-1.5 py-0">
+          {t("out-of-stock")}
+        </Badge>
+          )}
+          {product.promo === true && (
+        <>
+            <Badge className="bg-green-600/90 text-white text-[10px] px-1.5 py-0">
+              اشترِي 2 واحصل على 1 مجانًا
             </Badge>
+            <Badge className="bg-green-600/90 text-white text-[10px] px-1.5 py-0">
+              اشترِي 4 واحصل على 2 مجانًا
+            </Badge>
+        </>
           )}
         </div>
 
-        {/* Wishlist Button */}
+        {/* Wishlist */}
         <Button
           variant="ghost"
           size="sm"
@@ -70,66 +73,37 @@ export function ProductCard({ product, onProductClick }: ProductCardProps) {
           <Heart className="h-4 w-4" />
         </Button>
 
-        {/* Quick Add to Cart */}
-        {product.inStock && (
+        {/* Add to cart */}
+        {!isOutOfStock && (
           <Button
-            variant="secondary"
-            size="sm"
-            className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-all translate-y-1 group-hover:translate-y-0 h-8 bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={handleAddToCart}
-            disabled={isLoading}
+        variant="secondary"
+        size="sm"
+        className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-all translate-y-1 group-hover:translate-y-0 h-8 bg-blue-600 hover:bg-blue-700 text-white"
+        onClick={handleAddToCart}
+        disabled={isLoading}
           >
-            <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-            <span className="text-xs">{isLoading ? '...' : t('add-to-cart')}</span>
+        <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
+        <span className="text-xs">
+          {isLoading ? "..." : t("add-to-cart")}
+        </span>
           </Button>
         )}
       </div>
 
       <CardContent className="p-3 flex-1 flex flex-col gap-1.5">
-        {/* Product Info */}
-        <h3 className="font-medium text-sm line-clamp-1">
-          {product.name[language]}
-        </h3>
-        
-        <div className="relative">
-          <p className={`text-muted-foreground text-xs transition-all duration-300 ${isExpanded ? '' : 'line-clamp-1'}`}>
-            {product.description[language]}
-          </p>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[10px] h-4 p-0 text-blue-600 hover:text-blue-700 hover:bg-transparent w-full flex items-center justify-center mt-0.5"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsExpanded(!isExpanded);
-            }}
-          >
-            {isExpanded ? (
-              <><ChevronUp className="h-3 w-3" /> {t('show-less')}</>
-            ) : (
-              <><ChevronDown className="h-3 w-3" /> {t('show-more')}</>
-            )}
-          </Button>
-        </div>
-
-        {/* Price and Stock */}
+        {/* Infos */}
+        <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
         <div className="flex items-center justify-between mt-auto">
           <div className="flex flex-col gap-0.5">
             <span className="font-semibold text-sm">
-              {formatPrice(product.price)}
+              {product.price.toLocaleString()} {t("currency")}
             </span>
-            {product.originalPrice && (
+            {isPromo && (
               <span className="text-xs text-muted-foreground/80 line-through -mt-0.5">
-                {formatPrice(product.originalPrice)}
+                {product.originalPrice.toLocaleString()} {t("currency")}
               </span>
             )}
           </div>
-          
-          {!product.inStock && (
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-muted/90">
-              {t('out-of-stock')}
-            </Badge>
-          )}
         </div>
       </CardContent>
     </Card>

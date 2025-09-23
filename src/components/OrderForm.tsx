@@ -6,97 +6,64 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useShop } from '@/contexts/ShopContext';
-import { toast } from '@/hooks/use-toast';
+import { CustomerInfo } from '@/models/types';
 
 interface OrderFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
+  name: string;
   phone: string;
-  address: string;
-  city: string;
-  postalCode: string;
+  streetNumber: string; // رقم الشارع (Street Number)
+  areaNumber: string;   // رقم المنطقة (Area Number)
+  villaNumber: string;  // رقم الفيلا (Villa Number)
   notes?: string;
 }
 
-export function OrderForm({ inline = false, onCancel }: { inline?: boolean; onCancel?: () => void }) {
+export function OrderForm({
+  inline = false,
+  onCancel,
+  onSubmit,
+}: {
+  inline?: boolean;
+  onCancel?: () => void;
+  onSubmit?: (customerInfo: CustomerInfo) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
-  const { cartItems, getCartTotal, clearCart, language, t } = useShop();
+  const { cartItems, getCartTotal, t } = useShop();
   const form = useForm<OrderFormData>();
 
-  const onSubmit = (data: OrderFormData) => {
-    // Simulation de soumission de commande
-    const orderData = {
-      ...data,
-      items: cartItems,
-      total: getCartTotal(),
-      orderDate: new Date().toISOString(),
+  const handleFormSubmit = (data: OrderFormData) => {
+    // Compose the address string from the three new fields to stay compatible with CustomerInfo
+    const composedAddress = `رقم الشارع (Street No.): ${data.streetNumber}، رقم المنطقة (Area No.): ${data.areaNumber}، رقم الفيلا (Villa No.): ${data.villaNumber}`;
+
+    const customerInfo: CustomerInfo = {
+      name: data.name,
+      phone: data.phone,
+      address: composedAddress
     };
 
-    console.log('Order submitted:', orderData);
-    
-    // Afficher un message de succès en précisant le paiement en espèces à la livraison
-    toast({
-      title: language === 'fr' ? 'Commande reçue' : 'تم استلام الطلب',
-      description: language === 'fr'
-        ? 'Votre commande a été reçue. Paiement: espèces à la livraison. Nous vous contacterons bientôt.'
-        : 'تم استلام طلبك. طريقة الدفع: نقدًا عند التسليم. سنتواصل معك قريباً.',
-    });
+    if (onSubmit) onSubmit(customerInfo);
 
-  // Vider le panier et fermer le modal / vue inline
-  clearCart();
-  setIsOpen(false);
-  form.reset();
-  if (inline && onCancel) onCancel();
+    form.reset();
+    setIsOpen(false);
+    if (inline && onCancel) onCancel();
   };
 
-  const formLabels = {
-    fr: {
-      firstName: 'Prénom',
-      lastName: 'Nom',
-      email: 'Email',
-      phone: 'Téléphone',
-      address: 'Adresse',
-      city: 'Ville',
-      postalCode: 'Code postal',
-      notes: 'Notes (optionnel)',
-      submitOrder: 'Envoyer la commande',
-      orderForm: 'Formulaire de commande',
-      orderSummary: 'Résumé de la commande',
-    },
-    ar: {
-      firstName: 'الاسم الأول',
-      lastName: 'اسم العائلة',
-      email: 'البريد الإلكتروني',
-      phone: 'الهاتف',
-      address: 'العنوان',
-      city: 'المدينة',
-      postalCode: 'الرمز البريدي',
-      notes: 'ملاحظات (اختياري)',
-      submitOrder: 'إرسال الطلب',
-      orderForm: 'نموذج الطلب',
-      orderSummary: 'ملخص الطلب',
-    },
+  const labels = {
+    name: 'الاسم الكامل (Full Name)',
+    phone: 'الهاتف (Phone)',
+    streetNumber: 'رقم الشارع (Street Number)',
+    areaNumber: 'رقم المنطقة (Area Number)',
+    villaNumber: 'رقم الفيلا (Villa Number)',
+    notes: 'ملاحظات (اختياري) (Notes - optional)',
+    submitOrder: 'إرسال الطلب (Submit Order)',
+    orderForm: 'نموذج الطلب (Order Form)',
+    orderSummary: 'ملخص الطلب (Order Summary)',
+    return: 'ارجع (Back)',
   };
 
-  const labels = formLabels[language];
+  if (cartItems.length === 0) return null;
 
-  if (cartItems.length === 0) {
-    return null;
-  }
-
-  // Inner content shared between dialog and inline modes
   const innerContent = (
-    <div className="max-w-2xl max-h-[80vh] overflow-y-auto">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{labels.orderForm}</h2>
-        {inline && (
-          <Button variant="ghost" size="sm" onClick={onCancel}>
-            {language === 'fr' ? 'Retour' : '\u0627\u0631\u062c\u0639'}
-          </Button>
-        )}
-      </div>
-
+    <div className="max-w-2xl">
       <div className="grid grid-cols-1 gap-6">
         {/* Order Summary */}
         <div>
@@ -105,10 +72,8 @@ export function OrderForm({ inline = false, onCancel }: { inline?: boolean; onCa
             {cartItems.map((item) => (
               <div key={`${item.product.id}-${item.selectedColor}`} className="flex justify-between text-sm">
                 <span className="flex-1">
-                  {item.product.name[language]}
-                  {item.selectedColor && (
-                    <span className="text-muted-foreground"> - {item.selectedColor}</span>
-                  )}
+                  {item.product.name}
+                  {item.selectedColor && <span className="text-muted-foreground"> - {item.selectedColor}</span>}
                   <span className="text-muted-foreground"> x{item.quantity}</span>
                 </span>
                 <span className="font-medium">
@@ -127,15 +92,21 @@ export function OrderForm({ inline = false, onCancel }: { inline?: boolean; onCa
 
         {/* Order Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <form
+            onSubmit={form.handleSubmit((data) => {
+              handleFormSubmit(data);
+            })}
+            className="flex flex-col"
+            style={{ maxHeight: '60vh' }}
+          >
+            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
               <FormField
                 control={form.control}
-                name="firstName"
+                name="name"
                 rules={{ required: true }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.firstName}</FormLabel>
+                    <FormLabel>{labels.name}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -143,13 +114,14 @@ export function OrderForm({ inline = false, onCancel }: { inline?: boolean; onCa
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
-                name="lastName"
+                name="phone"
                 rules={{ required: true }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.lastName}</FormLabel>
+                    <FormLabel>{labels.phone}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -157,67 +129,14 @@ export function OrderForm({ inline = false, onCancel }: { inline?: boolean; onCa
                   </FormItem>
                 )}
               />
-            </div>
 
-            <FormField
-              control={form.control}
-              name="email"
-              rules={{ 
-                required: true,
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Email invalide'
-                }
-              }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{labels.email}</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{labels.phone}</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="address"
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{labels.address}</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="city"
+                name="streetNumber"
                 rules={{ required: true }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.city}</FormLabel>
+                    <FormLabel>{labels.streetNumber}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -225,55 +144,66 @@ export function OrderForm({ inline = false, onCancel }: { inline?: boolean; onCa
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
-                name="postalCode"
+                name="areaNumber"
                 rules={{ required: true }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.postalCode}</FormLabel>
+                    <FormLabel>{labels.areaNumber}</FormLabel>
                     <FormControl>
                       <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="villaNumber"
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.villaNumber}</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{labels.notes}</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} className="min-h-[90px]" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{labels.notes}</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" className="w-full">
-              {labels.submitOrder}
-            </Button>
+            <div className="sticky bottom-0 bg-white pt-4 pb-2 z-10 border-t shadow-[0_-2px_8px_-2px_rgba(0,0,0,0.08)]">
+              <Button type="submit" className="w-full">{labels.submitOrder}</Button>
+            </div>
           </form>
         </Form>
       </div>
     </div>
   );
 
-  if (inline) {
-    return innerContent;
-  }
+  if (inline) return innerContent;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="w-full">
-          {labels.submitOrder}
-        </Button>
+        <Button size="lg" className="w-full">{labels.submitOrder}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

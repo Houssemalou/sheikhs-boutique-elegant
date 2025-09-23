@@ -1,24 +1,36 @@
-import { ShoppingCart, Search, Globe, Menu, X } from 'lucide-react';
+import { ShoppingCart, Search, Globe, Menu, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useShop } from '@/contexts/ShopContext';
-import { categories } from '@/data/products';
-import { Category } from '@/types';
+import { Category } from '@/models/types';
 
 interface HeaderProps {
-  selectedCategory: Category;
-  onCategoryChange: (category: Category) => void;
+  categories: Category[];
+  selectedCategory: string | number;
+  onCategoryChange: (categoryId: string | number) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
 }
 
-export function Header({ selectedCategory, onCategoryChange, searchQuery, onSearchChange }: HeaderProps) {
+const MAX_VISIBLE_CATEGORIES = 5;
+
+export function Header({
+  categories = [],
+  selectedCategory,
+  onCategoryChange,
+  searchQuery,
+  onSearchChange,
+}: HeaderProps) {
   const { language, setLanguage, toggleCart, getCartItemsCount, t, setCartOpen } = useShop();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   const cartItemsCount = getCartItemsCount();
+
+  const visibleCategories = categories.slice(0, MAX_VISIBLE_CATEGORIES);
+  const moreCategories = categories.slice(MAX_VISIBLE_CATEGORIES);
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -26,24 +38,58 @@ export function Header({ selectedCategory, onCategoryChange, searchQuery, onSear
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gradient">Sheikh Store</h1>
+            <h1 className="text-2xl font-bold text-gradient">ARDA Store</h1>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {categories.map((category) => (
+          <nav className="hidden lg:flex items-center space-x-2">
+            {visibleCategories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => onCategoryChange(category.id as Category)}
+                onClick={() => onCategoryChange(category.id)}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors hover:text-primary ${
                   selectedCategory === category.id
                     ? 'bg-foreground text-background'
                     : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
-                {category.name[language]}
+                {category.name}
               </button>
             ))}
+            {moreCategories.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => setIsMoreOpen((open) => !open)}
+                  className="flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
+                >
+                  {t('more') || 'Voir plus'}
+                  <ChevronDown className="ml-1 h-4 w-4" />
+                </button>
+                {isMoreOpen && (
+                  <div
+                    className="absolute left-0 mt-2 w-40 bg-background border border-border rounded-md shadow-lg z-50"
+                    onMouseLeave={() => setIsMoreOpen(false)}
+                  >
+                    {moreCategories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => {
+                          onCategoryChange(category.id);
+                          setIsMoreOpen(false);
+                        }}
+                        className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
+                          selectedCategory === category.id
+                            ? 'bg-foreground text-background'
+                            : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                        }`}
+                      >
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           {/* Search Bar */}
@@ -61,22 +107,14 @@ export function Header({ selectedCategory, onCategoryChange, searchQuery, onSear
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            {/* Language Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLanguage(language === 'fr' ? 'ar' : 'fr')}
-              className="hidden sm:flex items-center space-x-2"
-            >
-              <Globe className="h-4 w-4" />
-              <span className="text-sm font-medium">{language.toUpperCase()}</span>
-            </Button>
-
             {/* Cart */}
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setCartOpen(true); setIsMobileMenuOpen(false); }}
+              onClick={() => {
+                setCartOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
               className="relative"
             >
               <ShoppingCart className="h-5 w-5" />
@@ -120,7 +158,7 @@ export function Header({ selectedCategory, onCategoryChange, searchQuery, onSear
                   <button
                     key={category.id}
                     onClick={() => {
-                      onCategoryChange(category.id as Category);
+                      onCategoryChange(category.id);
                       setIsMobileMenuOpen(false);
                     }}
                     className={`text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -129,21 +167,10 @@ export function Header({ selectedCategory, onCategoryChange, searchQuery, onSear
                         : 'text-muted-foreground hover:text-primary hover:bg-muted'
                     }`}
                   >
-                    {category.name[language]}
+                    {category.name}
                   </button>
                 ))}
               </nav>
-
-              {/* Mobile Language Toggle */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setLanguage(language === 'fr' ? 'ar' : 'fr')}
-                className="w-full justify-center"
-              >
-                <Globe className="h-4 w-4 mr-2" />
-                {language === 'fr' ? 'العربية' : 'Français'}
-              </Button>
             </div>
           </div>
         )}

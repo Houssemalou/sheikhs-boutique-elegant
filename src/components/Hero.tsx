@@ -9,24 +9,24 @@ export function Hero() {
   const content = {
     fr: {
       badge: 'Nouveau',
-      title: 'Découvrez Sheikh Store',
+      title: 'Découvrez الأردا Store',
       subtitle: 'Votre destination premium pour l\'électronique, cosmétiques et mode',
       description: 'Des produits de qualité, livraison rapide et service client exceptionnel',
       cta: 'Découvrir nos produits',
       features: [
-        'Livraison gratuite dès 500 DH',
+        'Livraison 100% gratuite',
         'Garantie satisfaction',
         'Support client 24/7'
       ]
     },
     ar: {
       badge: 'جديد',
-      title: 'اكتشف متجر الشيخ',
+      title: 'اكتشف متجر الأردا',
       subtitle: 'وجهتك المميزة للإلكترونيات ومستحضرات التجميل والأزياء',
       description: 'منتجات عالية الجودة وتوصيل سريع وخدمة عملاء استثنائية',
       cta: 'اكتشف منتجاتنا',
       features: [
-        'شحن مجاني من 500 درهم',
+        'شحن مجاني م',
         'ضمان الرضا',
         'دعم العملاء 24/7'
       ]
