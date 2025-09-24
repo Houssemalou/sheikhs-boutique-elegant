@@ -9,6 +9,7 @@ export interface ProductDTO {
   status: string;
   discount?: number; 
   promo: boolean;
+  description?: string;
 }
 
 export interface CategoryResDTO {

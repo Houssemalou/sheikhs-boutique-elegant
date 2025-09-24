@@ -30,11 +30,14 @@ const Index = () => {
 
   const categories_header = useMemo(() => {
     if (!categories) return [];
-    return categories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      description: cat.description,
-    }));
+    // Filtrer seulement les catégories qui ont des produits
+    return categories
+      .filter((cat) => cat.products && cat.products.length > 0)
+      .map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        description: cat.description,
+      }));
     }, [categories]);
   
 
