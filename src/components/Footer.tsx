@@ -32,7 +32,8 @@ export function Footer() {
     title: t('footer.store_title'),
     description: t('footer.store_description'),
     address: t('footer.address'),
-    email: 'Mtjralshykhelsheikhstore@gmail.com',
+    email: 'ardastore598@gmail.com',
+    phone: '+974 7033 6561',
     hours: t('footer.hours_24_7')
   };
 
@@ -73,12 +74,16 @@ export function Footer() {
                 <span>{contactInfo.email}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
+                <Phone className="h-4 w-4 text-primary flex-shrink-0" />
+                <a href={`tel:${contactInfo.phone}`} className="hover:text-primary">{contactInfo.phone}</a>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
                 <Instagram className="h-4 w-4 text-primary flex-shrink-0" />
                 <a href="https://www.instagram.com/elsheikh_store1" target="_blank" className="hover:text-primary">Instagram</a>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Globe className="h-4 w-4 text-primary flex-shrink-0" />
-                <a href="https://www.tiktok.com/@elsheikh.store1" target="_blank" className="hover:text-primary">TikTok</a>
+                <a href="https://www.tiktok.com/@arda.store0?_r=1&_t=ZS-92H1PbQ8vZt" target="_blank" className="hover:text-primary">TikTok</a>
 
                
               </div>

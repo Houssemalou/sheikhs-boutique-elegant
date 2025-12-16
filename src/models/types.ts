@@ -1,6 +1,7 @@
 export interface ProductDTO {
   id: number;
   name: string;
+  description?: string;
   photoPath: string;
   category?: string;
   price: number;
@@ -9,7 +10,7 @@ export interface ProductDTO {
   status: string;
   discount?: number; 
   promo: boolean;
-  description?: string;
+  images?: string[]; // Tableau d'images supplémentaires
 }
 
 export interface CategoryResDTO {

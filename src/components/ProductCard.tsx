@@ -40,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
     >
       <div className="relative overflow-hidden aspect-square">
         <img
-          src={product.photoPath}
+          src={product.images && product.images.length > 0 ? product.images[0] : product.photoPath}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
@@ -61,16 +61,6 @@ export function ProductCard({ product }: ProductCardProps) {
         <Badge className="bg-gray-600/90 text-white text-[10px] px-1.5 py-0">
           {t("product.out_of_stock")}
         </Badge>
-          )}
-          {product.promo === true && (
-        <>
-            <Badge className="bg-green-600/90 text-white text-[10px] px-1.5 py-0">
-              اشترِي 2 واحصل على 1 مجانًا
-            </Badge>
-            <Badge className="bg-green-600/90 text-white text-[10px] px-1.5 py-0">
-              اشترِي 4 واحصل على 2 مجانًا
-            </Badge>
-        </>
           )}
         </div>
 

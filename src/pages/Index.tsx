@@ -5,6 +5,8 @@ import { Hero } from "@/components/Hero";
 import { ProductCard } from "@/components/ProductCard";
 import { Cart } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
+import { PoliciesSection } from "@/components/PoliciesSection";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useShop } from "@/contexts/ShopContext";
 import { getCategories } from "@/services/productsService";
 import { CategoryResDTO, ProductDTO } from "@/models/types";
@@ -190,8 +192,10 @@ console.log("All Products:", groupedProducts);
         </section>
       </main>
 
+      <PoliciesSection />
       <Footer />
       <Cart />
+      <WhatsAppButton />
     </div>
   );
 };

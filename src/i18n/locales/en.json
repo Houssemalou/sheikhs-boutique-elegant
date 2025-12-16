@@ -85,7 +85,7 @@
     "cash_on_delivery_desc": "Cash only upon delivery",
     "support_24_7": "24/7 Support",
     "support_24_7_desc": "Dedicated customer support",
-    "store_title": "Sheikh Store",
+    "store_title": "ARDA Store",
     "store_description": "Your trusted destination for electronics, cosmetics and luxury fashion",
     "address": "Qatar, Doha",
     "about": "About",
@@ -110,6 +110,18 @@
     "payment_method": "Payment method:",
     "cash_payment": "Cash on delivery",
     "rights": "All rights reserved"
+  },
+  "policies": {
+    "main_title": "Our Policies",
+    "subtitle": "Transparency and trust are our priorities. Learn about our terms, privacy policy, and return policy.",
+    "terms_title": "Terms & Conditions",
+    "terms_desc": "By using our website or making a purchase, you agree to these terms. All information must be accurate and the website must be used lawfully.",
+    "privacy_title": "Privacy Policy",
+    "privacy_desc": "We are committed to protecting your privacy. Personal data is used solely for order processing and is not shared except as required by law.",
+    "return_title": "Return & Exchange",
+    "return_desc": "You can return or exchange products within 24 hours of delivery, provided the item is unused and in its original condition.",
+    "download_button": "Download Complete Policy",
+    "download_info": "Get the full document with all our policies in PDF format"
   },
   "common": {
     "language": "Language",

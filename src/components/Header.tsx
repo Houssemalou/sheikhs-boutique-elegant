@@ -48,13 +48,12 @@ export function Header({
       <div className="container">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center shadow-lg">
-                <Store className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                {t('header.store_name')}
-              </h1>
+            <div className="flex items-center gap-3">
+              <img 
+                src="/arda-logo.svg" 
+                alt="ARDA Store Logo" 
+                className="h-12 w-auto object-contain"
+              />
             </div>
           </div>
 
