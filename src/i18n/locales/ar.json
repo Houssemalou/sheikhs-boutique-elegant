@@ -1,0 +1,123 @@
+{
+  "header": {
+    "store_name": "متجر ARDA",
+    "search_placeholder": "البحث عن المنتجات...",
+    "more": "المزيد",
+    "all_categories": "جميع الفئات"
+  },
+  "hero": {
+    "slide1": {
+      "title": "مرحبا بكم في متجر ARDA",
+      "subtitle": "اكتشف منتجاتنا عالية الجودة بأسعار لا تقبل المنافسة",
+      "cta": "عرض المنتجات"
+    },
+    "slide2": {
+      "title": "توصيل سريع",
+      "subtitle": "استلم طلباتك خلال 24-48 ساعة في جميع أنحاء قطر",
+      "cta": "اطلب الآن"
+    },
+    "slide3": {
+      "title": "خدمة العملاء 24/7",
+      "subtitle": "فريقنا موجود دائمًا لمساعدتك",
+      "cta": "اتصل بنا"
+    }
+  },
+  "product": {
+    "section_title": "منتجاتنا",
+    "search_results": "النتائج لـ",
+    "no_products_found": "لم يتم العثور على منتجات",
+    "loading_error": "حدث خطأ أثناء تحميل المنتجات",
+    "similar_products": "منتجات مماثلة",
+    "read_more": "عرض المزيد",
+    "read_less": "عرض أقل",
+    "add_to_cart": "أضف إلى السلة",
+    "out_of_stock": "نفد من المخزون",
+    "in_stock": "متوفر",
+    "view_details": "عرض التفاصيل",
+    "quick_order": "اطلب الآن",
+    "description": "الوصف",
+    "price": "السعر",
+    "quantity": "الكمية",
+    "total": "المجموع",
+    "buy_now": "اشتري الآن",
+    "select_color": "اختر اللون",
+    "back_to_products": "العودة إلى المنتجات"
+  },
+  "cart": {
+    "title": "سلة التسوق",
+    "empty": "سلتك فارغة",
+    "continue_shopping": "متابعة التسوق",
+    "view_cart": "عرض السلة",
+    "checkout": "إتمام الطلب",
+    "remove": "إزالة",
+    "quantity": "الكمية",
+    "subtotal": "المجموع الفرعي",
+    "total": "المجموع",
+    "items_count": "منتج"
+  },
+  "order": {
+    "title": "إتمام طلبك",
+    "order_summary": "ملخص الطلب",
+    "customer_info": "معلومات العميل",
+    "name": "الاسم الكامل",
+    "phone": "الهاتف",
+    "address": "عنوان التوصيل",
+    "street_number": "رقم الشارع",
+    "area_number": "رقم المنطقة",
+    "villa_number": "رقم الفيلا",
+    "notes": "ملاحظات",
+    "notes_optional": "ملاحظات (اختياري)",
+    "shipping_method": "طريقة الشحن",
+    "standard": "عادي 3-5 أيام",
+    "express": "سريع 24-48 ساعة",
+    "payment_method": "طريقة الدفع",
+    "cash_on_delivery": "الدفع عند الاستلام",
+    "submit": "تأكيد الطلب",
+    "success": "تم تأكيد الطلب",
+    "error": "خطأ في إتمام الطلب"
+  },
+  "footer": {
+    "free_shipping": "شحن مجاني",
+    "free_shipping_desc": "لجميع الطلبات",
+    "easy_return": "إرجاع سهل",
+    "easy_return_desc": "يوم واحد لتغيير رأيك",
+    "cash_on_delivery": "الدفع عند التسليم",
+    "cash_on_delivery_desc": "الدفع نقدًا فقط عند التسليم",
+    "support_24_7": "دعم 24/7",
+    "support_24_7_desc": "دعم عملاء متخصص",
+    "store_title": "متجر الشيخ",
+    "store_description": "وجهتك الموثوقة للإلكترونيات ومستحضرات التجميل والأزياء الفاخرة",
+    "address": "قطر ,الدوحة",
+    "about": "عن المتجر",
+    "about_text": "متجر ARDA - وجهتك الموثوقة للمنتجات عالية الجودة",
+    "contact": "اتصل بنا",
+    "phone": "الهاتف",
+    "email": "البريد الإلكتروني",
+    "quick_links": "روابط سريعة",
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "about_us": "معلومات عنا",
+    "return_policy": "سياسة الإرجاع",
+    "terms_of_use": "شروط الاستخدام",
+    "privacy": "الخصوصية",
+    "contact_us": "اتصل بنا",
+    "follow_us": "تابعنا",
+    "customer_service": "خدمة العملاء",
+    "working_hours": "ساعات العمل",
+    "hours_24_7": "7/24",
+    "help": "المساعدة",
+    "live_chat": "محادثة مباشرة متاحة",
+    "payment_method": "طريقة الدفع:",
+    "cash_payment": "الدفع نقدًا عند التسليم",
+    "rights": "جميع الحقوق محفوظة"
+  },
+  "common": {
+    "language": "اللغة",
+    "currency": "ر.ق",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء"
+  }
+}

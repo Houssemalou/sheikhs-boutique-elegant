@@ -6,14 +6,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useShop } from '@/contexts/ShopContext';
-import { CustomerInfo } from '@/models/types';
+import { CustomerInfo, CartItem } from '@/models/types';
+import { useTranslation } from 'react-i18next';
+import { useMutation } from '@tanstack/react-query';
+import { createOrder } from '@/services/orderService';
+import { toast } from '@/hooks/use-toast';
 
 interface OrderFormData {
   name: string;
   phone: string;
-  streetNumber: string; // رقم الشارع (Street Number)
-  areaNumber: string;   // رقم المنطقة (Area Number)
-  villaNumber: string;  // رقم الفيلا (Villa Number)
+  streetNumber: string;
+  areaNumber: string;
+  villaNumber: string;
   notes?: string;
 }
 
@@ -21,18 +25,59 @@ export function OrderForm({
   inline = false,
   onCancel,
   onSubmit,
+  onClose,
+  initialItems,
 }: {
   inline?: boolean;
   onCancel?: () => void;
   onSubmit?: (customerInfo: CustomerInfo) => void;
+  onClose?: () => void;
+  initialItems?: CartItem[];
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const { cartItems, getCartTotal, t } = useShop();
+  const [isOpen, setIsOpen] = useState(initialItems ? true : false);
+  const { cartItems, clearCart } = useShop();
+  const { t } = useTranslation();
   const form = useForm<OrderFormData>();
 
+  // Use initialItems if provided, otherwise use cart items
+  const itemsToOrder = initialItems || cartItems;
+  
+  const calculateTotal = () => {
+    return itemsToOrder.reduce((total, item) => total + item.product.price * item.quantity, 0);
+  };
+
+  // Utiliser la même logique que Cart.tsx
+  const {
+    mutate: submitOrder,
+    isPending,
+    isSuccess,
+  } = useMutation({
+    mutationFn: createOrder,
+    onSuccess: () => {
+      // Si c'est depuis le panier (pas initialItems), vider le panier
+      if (!initialItems) {
+        clearCart();
+      }
+      toast({
+        title: '✓ ' + t('order.success'),
+        description: t('order.success'),
+      });
+      form.reset();
+      setIsOpen(false);
+      if (inline && onCancel) onCancel();
+      if (onClose) onClose();
+    },
+    onError: (error) => {
+      toast({
+        title: '✗ ' + t('common.error'),
+        description: t('order.error'),
+        variant: 'destructive',
+      });
+    },
+  });
+
   const handleFormSubmit = (data: OrderFormData) => {
-    // Compose the address string from the three new fields to stay compatible with CustomerInfo
-    const composedAddress = `رقم الشارع (Street No.): ${data.streetNumber}، رقم المنطقة (Area No.): ${data.areaNumber}، رقم الفيلا (Villa No.): ${data.villaNumber}`;
+    const composedAddress = `${t('order.street_number')}: ${data.streetNumber}, ${t('order.area_number')}: ${data.areaNumber}, ${t('order.villa_number')}: ${data.villaNumber}`;
 
     const customerInfo: CustomerInfo = {
       name: data.name,
@@ -40,27 +85,41 @@ export function OrderForm({
       address: composedAddress
     };
 
-    if (onSubmit) onSubmit(customerInfo);
+    // Construire la commande avec la même structure que Cart.tsx
+    const order = {
+      items: itemsToOrder.map((item) => ({
+        productName: item.product.name,
+        quantity: item.quantity,
+      })),
+      total: calculateTotal(),
+      customerInfo: customerInfo,
+    };
 
-    form.reset();
+    submitOrder(order);
+
+    // Appeler onSubmit si fourni (pour compatibilité)
+    if (onSubmit) onSubmit(customerInfo);
+  };
+
+  const handleClose = () => {
     setIsOpen(false);
-    if (inline && onCancel) onCancel();
+    if (onClose) onClose();
   };
 
   const labels = {
-    name: 'الاسم الكامل (Full Name)',
-    phone: 'الهاتف (Phone)',
-    streetNumber: 'رقم الشارع (Street Number)',
-    areaNumber: 'رقم المنطقة (Area Number)',
-    villaNumber: 'رقم الفيلا (Villa Number)',
-    notes: 'ملاحظات (اختياري) (Notes - optional)',
-    submitOrder: 'إرسال الطلب (Submit Order)',
-    orderForm: 'نموذج الطلب (Order Form)',
-    orderSummary: 'ملخص الطلب (Order Summary)',
-    return: 'ارجع (Back)',
+    name: t('order.name'),
+    phone: t('order.phone'),
+    streetNumber: t('order.street_number'),
+    areaNumber: t('order.area_number'),
+    villaNumber: t('order.villa_number'),
+    notes: t('order.notes_optional'),
+    submitOrder: t('order.submit'),
+    orderForm: t('order.title'),
+    orderSummary: t('order.order_summary'),
+    return: 'Back',
   };
 
-  if (cartItems.length === 0) return null;
+  if (itemsToOrder.length === 0) return null;
 
   const innerContent = (
     <div className="max-w-2xl">
@@ -69,7 +128,7 @@ export function OrderForm({
         <div>
           <h3 className="font-semibold mb-4">{labels.orderSummary}</h3>
           <div className="space-y-3 mb-4">
-            {cartItems.map((item) => (
+            {itemsToOrder.map((item) => (
               <div key={`${item.product.id}-${item.selectedColor}`} className="flex justify-between text-sm">
                 <span className="flex-1">
                   {item.product.name}
@@ -77,15 +136,15 @@ export function OrderForm({
                   <span className="text-muted-foreground"> x{item.quantity}</span>
                 </span>
                 <span className="font-medium">
-                  {(item.product.price * item.quantity).toLocaleString()} {t('currency')}
+                  {(item.product.price * item.quantity).toLocaleString()} {t('common.currency')}
                 </span>
               </div>
             ))}
           </div>
           <div className="border-t pt-3">
             <div className="flex justify-between font-semibold">
-              <span>{t('total')}</span>
-              <span>{getCartTotal().toLocaleString()} {t('currency')}</span>
+              <span>{t('cart.total')}</span>
+              <span>{calculateTotal().toLocaleString()} {t('common.currency')}</span>
             </div>
           </div>
         </div>
@@ -97,9 +156,8 @@ export function OrderForm({
               handleFormSubmit(data);
             })}
             className="flex flex-col"
-            style={{ maxHeight: '60vh' }}
           >
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+            <div className="space-y-3">
               <FormField
                 control={form.control}
                 name="name"
@@ -189,8 +247,10 @@ export function OrderForm({
                 )}
               />
             </div>
-            <div className="sticky bottom-0 bg-white pt-4 pb-2 z-10 border-t shadow-[0_-2px_8px_-2px_rgba(0,0,0,0.08)]">
-              <Button type="submit" className="w-full">{labels.submitOrder}</Button>
+            <div className="pt-4">
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? t('common.loading') : labels.submitOrder}
+              </Button>
             </div>
           </form>
         </Form>
@@ -201,7 +261,7 @@ export function OrderForm({
   if (inline) return innerContent;
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogTrigger asChild>
         <Button size="lg" className="w-full">{labels.submitOrder}</Button>
       </DialogTrigger>

@@ -1,36 +1,39 @@
 import { Truck, Shield, RotateCcw, Headphones, Mail, Phone, MapPin, Instagram, Globe  } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function Footer() {
+  const { t } = useTranslation();
+  
   const features = [
   {
     icon: Truck,
-    title: 'شحن مجاني (Free Shipping)',
-    description: 'لجميع الطلبات (For all orders)',
+    title: t('footer.free_shipping'),
+    description: t('footer.free_shipping_desc'),
   },
   {
     icon: RotateCcw,
-    title: 'إرجاع سهل (Easy Return)',
-    description: '1 يوم لتغيير رأيك (1 day to change your mind)',
+    title: t('footer.easy_return'),
+    description: t('footer.easy_return_desc'),
   },
   {
     icon: Shield,
-    title: 'الدفع عند التسليم (Cash on Delivery)',
-    description: 'الدفع نقدًا فقط عند التسليم (Cash only upon delivery)',
+    title: t('footer.cash_on_delivery'),
+    description: t('footer.cash_on_delivery_desc'),
   },
   {
     icon: Headphones,
-    title: 'دعم 24/7 (24/7 Support)',
-    description: 'دعم عملاء مخصص (Dedicated customer support)',
+    title: t('footer.support_24_7'),
+    description: t('footer.support_24_7_desc'),
   },
 ];
 
 
   const contactInfo = {
-    title: 'متجر الشيخ',
-    description: 'وجهتك الموثوقة للإلكترونيات ومستحضرات التجميل والأزياء الفاخرة.',
-    address: 'قطر ,الدوحة',
+    title: t('footer.store_title'),
+    description: t('footer.store_description'),
+    address: t('footer.address'),
     email: 'Mtjralshykhelsheikhstore@gmail.com',
-    hours: '7/24'
+    hours: t('footer.hours_24_7')
   };
 
   return (
@@ -84,27 +87,27 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4">روابط سريعة</h4>
+            <h4 className="font-semibold mb-4">{t('footer.quick_links')}</h4>
             <div className="space-y-2 text-sm">
-              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">معلومات عنا</a>
-              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">سياسة الإرجاع</a>
-              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">شروط الاستخدام</a>
-              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">الخصوصية</a>
+              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">{t('footer.about_us')}</a>
+              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">{t('footer.return_policy')}</a>
+              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">{t('footer.terms_of_use')}</a>
+              <a href="#" className="block text-muted-foreground hover:text-primary transition-colors">{t('footer.privacy')}</a>
             </div>
           </div>
 
           {/* Customer Service */}
           <div>
-            <h4 className="font-semibold mb-4">خدمة العملاء</h4>
+            <h4 className="font-semibold mb-4">{t('footer.customer_service')}</h4>
             <div className="space-y-3">
               <div className="text-sm">
-                <div className="font-medium">ساعات العمل</div>
+                <div className="font-medium">{t('footer.working_hours')}</div>
                 <div className="text-muted-foreground">{contactInfo.hours}</div>
               </div>
               
               <div className="text-sm">
-                <div className="font-medium">المساعدة</div>
-                <div className="text-muted-foreground">محادثة مباشرة متاحة</div>
+                <div className="font-medium">{t('footer.help')}</div>
+                <div className="text-muted-foreground">{t('footer.live_chat')}</div>
               </div>
             </div>
           </div>
@@ -115,11 +118,11 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="container py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-muted-foreground">©{new Date().getFullYear()} Arda Store. جميع الحقوق محفوظة.</div>
+            <div className="text-sm text-muted-foreground">©{new Date().getFullYear()} Arda Store. {t('footer.rights')}.</div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>طريقة الدفع:</span>
+              <span>{t('footer.payment_method')}</span>
               <div className="flex gap-2">
-                <div className="px-2 py-1 bg-background rounded text-xs font-medium">الدفع نقدًا عند التسليم</div>
+                <div className="px-2 py-1 bg-background rounded text-xs font-medium">{t('footer.cash_payment')}</div>
               </div>
             </div>
           </div>

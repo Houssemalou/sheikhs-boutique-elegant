@@ -1,39 +1,46 @@
-import { ShoppingBag, Sparkles, Zap } from 'lucide-react';
+import { ShoppingBag, Truck, Headphones, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useShop } from '@/contexts/ShopContext';
+import { useTranslation } from 'react-i18next';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import { useRef } from 'react';
 
 export function Hero() {
-  const { language } = useShop();
+  const { t } = useTranslation();
+  const plugin = useRef(Autoplay({ delay: 5000, stopOnInteraction: false }));
 
-  const content = {
-    fr: {
-      badge: 'Nouveau',
-      title: 'Découvrez الأردا Store',
-      subtitle: 'Votre destination premium pour l\'électronique, cosmétiques et mode',
-      description: 'Des produits de qualité, livraison rapide et service client exceptionnel',
-      cta: 'Découvrir nos produits',
-      features: [
-        'Livraison 100% gratuite',
-        'Garantie satisfaction',
-        'Support client 24/7'
-      ]
+  const slides = [
+    {
+      title: t('hero.slide1.title'),
+      subtitle: t('hero.slide1.subtitle'),
+      cta: t('hero.slide1.cta'),
+      icon: Sparkles,
+      gradient: 'from-purple-600 via-pink-600 to-blue-600',
+      image: 'https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1920&h=1080&fit=crop&q=80'
     },
-    ar: {
-      badge: 'جديد',
-      title: 'اكتشف متجر الأردا',
-      subtitle: 'وجهتك المميزة للإلكترونيات ومستحضرات التجميل والأزياء',
-      description: 'منتجات عالية الجودة وتوصيل سريع وخدمة عملاء استثنائية',
-      cta: 'اكتشف منتجاتنا',
-      features: [
-        'شحن مجاني م',
-        'ضمان الرضا',
-        'دعم العملاء 24/7'
-      ]
+    {
+      title: t('hero.slide2.title'),
+      subtitle: t('hero.slide2.subtitle'),
+      cta: t('hero.slide2.cta'),
+      icon: Truck,
+      gradient: 'from-emerald-600 via-teal-600 to-cyan-600',
+      image: 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=1920&h=1080&fit=crop&q=80'
+    },
+    {
+      title: t('hero.slide3.title'),
+      subtitle: t('hero.slide3.subtitle'),
+      cta: t('hero.slide3.cta'),
+      icon: Headphones,
+      gradient: 'from-orange-600 via-red-600 to-pink-600',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1920&h=1080&fit=crop&q=80'
     }
-  };
-
-  const currentContent = content[language];
+  ];
 
   const scrollToProducts = () => {
     const productsSection = document.getElementById('products');
@@ -43,58 +50,71 @@ export function Hero() {
   };
 
   return (
-    <section className="relative py-20 lg:py-28 overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 gradient-primary opacity-5" />
-      
-      {/* Floating Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-32 h-32 bg-accent/10 rounded-full blur-xl animate-pulse delay-1000" />
-      
-      <div className="container relative">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <Badge className="mb-6 px-4 py-2 text-sm font-medium">
-            <Sparkles className="h-4 w-4 mr-2" />
-            {currentContent.badge}
-          </Badge>
+    <section className="relative overflow-hidden bg-gradient-to-b from-background to-secondary/20">
+      <Carousel
+        plugins={[plugin.current]}
+        className="w-full"
+        opts={{
+          align: 'start',
+          loop: true,
+        }}
+      >
+        <CarouselContent className="-ml-0">
+          {slides.map((slide, index) => {
+            const Icon = slide.icon;
+            return (
+              <CarouselItem key={index} className="pl-0">
+                <div className="relative py-20 lg:py-28 w-full">
+                  {/* Background Image with Overlay */}
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-100"
+                    style={{ backgroundImage: `url(${slide.image})` }}
+                  />
+                  
+                  {/* Dark Overlay for better text visibility */}
+                  <div className="absolute inset-0 bg-black/40" />
+                  
+                  {/* Gradient Overlay */}
+                  <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-10`} />
+                  
+                  <div className="container relative">
+                    <div className="max-w-4xl mx-auto text-center">
+                      {/* Icon */}
+                      <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 backdrop-blur">
+                        <Icon className="h-10 w-10 text-primary" />
+                      </div>
 
-          {/* Main Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-gradient">{currentContent.title}</span>
-          </h1>
+                      {/* Main Heading */}
+                      <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                        <span className="text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                          {slide.title}
+                        </span>
+                      </h1>
 
-          {/* Subtitle */}
-          <h2 className="text-xl md:text-2xl text-muted-foreground mb-6 max-w-2xl mx-auto leading-relaxed">
-            {currentContent.subtitle}
-          </h2>
+                      {/* Subtitle */}
+                      <h2 className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                        {slide.subtitle}
+                      </h2>
 
-          {/* Description */}
-          <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            {currentContent.description}
-          </p>
-
-          {/* CTA Button */}
-          <Button 
-            size="lg" 
-            className="mb-12 px-8 py-6 text-lg font-semibold shadow-elegant"
-            onClick={scrollToProducts}
-          >
-            <ShoppingBag className="h-5 w-5 mr-3" />
-            {currentContent.cta}
-          </Button>
-
-          {/* Features */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
-            {currentContent.features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-primary" />
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+                      {/* CTA Button */}
+                      <Button 
+                        size="lg" 
+                        className="px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+                        onClick={scrollToProducts}
+                      >
+                        <Icon className="h-5 w-5 mr-3" />
+                        {slide.cta}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            );
+          })}
+        </CarouselContent>
+        <CarouselPrevious className="left-4" />
+        <CarouselNext className="right-4" />
+      </Carousel>
     </section>
   );
 }

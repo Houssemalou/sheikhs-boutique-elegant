@@ -1,20 +1,22 @@
-import { ShoppingCart, Heart, Eye } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useShop } from "@/contexts/ShopContext";
 import { ProductDTO } from "@/models/types";
-import { ProductDetailsModal } from "@/components/ProductDetailsModal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface ProductCardProps {
   product: ProductDTO;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addToCart, t } = useShop();
+  const { addToCart } = useShop();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -24,12 +26,18 @@ export function ProductCard({ product }: ProductCardProps) {
     setIsLoading(false);
   };
 
+  const handleCardClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
   const isPromo = product.discount !== 0;
   const isOutOfStock = product.stock === 0;
-  const hasDescription = product.description && product.description.trim().length > 0;
 
   return (
-    <Card className="group cursor-pointer overflow-hidden h-full flex flex-col max-w-[220px]">
+    <Card 
+      className="group cursor-pointer overflow-hidden h-full flex flex-col max-w-[220px]"
+      onClick={handleCardClick}
+    >
       <div className="relative overflow-hidden aspect-square">
         <img
           src={product.photoPath}
@@ -51,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
           {isOutOfStock && (
         <Badge className="bg-gray-600/90 text-white text-[10px] px-1.5 py-0">
-          {t("out-of-stock")}
+          {t("product.out_of_stock")}
         </Badge>
           )}
           {product.promo === true && (
@@ -66,8 +74,8 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Actions (Wishlist + Eye icon) */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2">
+        {/* Actions (Wishlist only) */}
+        <div className="absolute top-3 right-3">
           <Button
             variant="ghost"
             size="sm"
@@ -76,21 +84,6 @@ export function ProductCard({ product }: ProductCardProps) {
           >
             <Heart className="h-4 w-4" />
           </Button>
-          
-          {/* Eye icon pour voir les détails (seulement si description existe) */}
-          {hasDescription && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsDetailsModalOpen(true);
-              }}
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-          )}
         </div>
 
         {/* Add to cart */}
@@ -98,13 +91,13 @@ export function ProductCard({ product }: ProductCardProps) {
           <Button
         variant="secondary"
         size="sm"
-        className="absolute bottom-2 left-2 right-2 opacity-0 group-hover:opacity-100 transition-all translate-y-1 group-hover:translate-y-0 h-8 bg-blue-600 hover:bg-blue-700 text-white"
+        className="absolute bottom-2 left-2 right-2 h-8 bg-blue-600 hover:bg-blue-700 text-white"
         onClick={handleAddToCart}
         disabled={isLoading}
           >
         <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
         <span className="text-xs">
-          {isLoading ? "..." : t("add-to-cart")}
+          {isLoading ? "..." : t("product.add_to_cart")}
         </span>
           </Button>
         )}
@@ -116,23 +109,16 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between mt-auto">
           <div className="flex flex-col gap-0.5">
             <span className="font-semibold text-sm">
-              {product.price.toLocaleString()} {t("currency")}
+              {product.price.toLocaleString()} {t("common.currency")}
             </span>
             {isPromo && (
               <span className="text-xs text-muted-foreground/80 line-through -mt-0.5">
-                {product.originalPrice.toLocaleString()} {t("currency")}
+                {product.originalPrice.toLocaleString()} {t("common.currency")}
               </span>
             )}
           </div>
         </div>
       </CardContent>
-
-      {/* Modal des détails du produit */}
-      <ProductDetailsModal
-        product={product}
-        isOpen={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-      />
     </Card>
   );
 }

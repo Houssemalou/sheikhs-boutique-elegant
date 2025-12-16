@@ -9,6 +9,7 @@ import { OrderForm } from "./OrderForm";
 import { useMutation } from "@tanstack/react-query";
 import { createOrder } from "@/services/orderService";
 import { CustomerInfo } from "@/models/types";
+import { useTranslation } from "react-i18next";
 
 export function Cart() {
   const {
@@ -19,13 +20,13 @@ export function Cart() {
     removeFromCart,
     clearCart,
     getCartTotal,
-    t,
   } = useShop();
 
+  const { t } = useTranslation();
   const [checkoutMode, setCheckoutMode] = useState(false);
 
   const formatPrice = (price: number) => {
-    return `${price.toLocaleString()} ر.ق`; // ✅ remplacer par ر.ق
+    return `${price.toLocaleString()} ${t('common.currency')}`;
   };
 
   // Livraison toujours gratuite → on retire toute logique de seuil/progress bar
@@ -70,7 +71,7 @@ export function Cart() {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
-            {t("view-cart")}
+            {t("cart.view_cart")}
             {cartItems.length > 0 && (
               <Badge variant="secondary">{cartItems.length}</Badge>
             )}
@@ -81,11 +82,32 @@ export function Cart() {
           {cartItems.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
               <ShoppingBag className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">{t("cart-empty")}</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("cart.empty")}</h3>
               <Button onClick={() => setCartOpen(false)} variant="outline">
-                {t("continue-shopping")}
+                {t("cart.continue_shopping")}
               </Button>
             </div>
+          ) : checkoutMode ? (
+            <>
+              {/* Mode Checkout - Formulaire */}
+              <div className="flex-1 overflow-y-auto -mx-6 px-6">
+                <OrderForm
+                  inline
+                  onCancel={() => setCheckoutMode(false)}
+                  onSubmit={handleOrderSubmit}
+                />
+              </div>
+
+              <div className="mt-4 space-y-3 border-t pt-4">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setCheckoutMode(false)}
+                >
+                  {t("cart.continue_shopping")}
+                </Button>
+              </div>
+            </>
           ) : (
             <>
               {/* ⛔ Progress bar supprimée (toujours Free Shipping) */}
@@ -161,105 +183,46 @@ export function Cart() {
 
               <Separator className="my-4" />
 
-              {checkoutMode ? (
-                <div>
-                  <OrderForm
-                    inline
-                    onCancel={() => setCheckoutMode(false)}
-                    onSubmit={handleOrderSubmit}
-                  />
-
-                  <div className="mt-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold">
-                        {t("order-summary") || t("total")}
-                      </span>
-                      <span className="font-bold text-lg">
-                        {formatPrice(currentTotal)}
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      <Button
-                        className="w-full"
-                        size="lg"
-                        onClick={() => {}} // déjà géré dans OrderForm
-                        disabled={isPending}
-                      >
-                        {isPending ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          t("submit-order") || t("checkout") 
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setCheckoutMode(false)}
-                      >
-                        {/* عربي + English */}
-                        العودة (Back)
-                      </Button>
-                    </div>
-
-                    {isError && (
-                      <p className="text-red-500 text-sm mt-2">
-                        {/* عربي + English */}
-                        {error?.message || "حدث خطأ أثناء الإرسال (Error while sending)"}
-                      </p>
-                    )}
-                    {isSuccess && (
-                      <p className="text-green-600 text-sm mt-2">
-                        {/* عربي + English */}
-                        ✅ تم إرسال الطلب بنجاح (Order sent successfully)
-                      </p>
-                    )}
-                  </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold">{t("cart.total")}</span>
+                  <span className="font-bold text-lg">
+                    {formatPrice(currentTotal)}
+                  </span>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">{t("total")}</span>
-                    <span className="font-bold text-lg">
-                      {formatPrice(currentTotal)}
-                    </span>
-                  </div>
 
-                  {/* Afficher toujours la Badgé Free Shipping */}
-                  <div className="flex items-center justify-center gap-2 text-sm font-medium">
-                    <Badge variant="outline">
-                      {/* عربي + English */}
-                      الشحن مجاني (Free Shipping)
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Button
-                      className="w-full"
-                      size="lg"
-                      onClick={() => setCheckoutMode(true)}
-                    >
-                      {t("checkout")}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => setCartOpen(false)}
-                    >
-                      {t("continue-shopping")}
-                    </Button>
-                    {cartItems.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        className="w-full text-muted-foreground"
-                        onClick={clearCart}
-                      >
-                        {/* عربي + English */}
-                        إفراغ السلة (Empty Cart)
-                      </Button>
-                    )}
-                  </div>
+                <div className="flex items-center justify-center gap-2 text-sm font-medium">
+                  <Badge variant="outline">
+                    الشحن مجاني
+                  </Badge>
                 </div>
-              )}
+
+                <div className="space-y-2">
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={() => setCheckoutMode(true)}
+                  >
+                    {t("cart.checkout")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setCartOpen(false)}
+                  >
+                    {t("cart.continue_shopping")}
+                  </Button>
+                  {cartItems.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      className="w-full text-muted-foreground"
+                      onClick={clearCart}
+                    >
+                      إفراغ السلة (Empty Cart)
+                    </Button>
+                  )}
+                </div>
+              </div>
             </>
           )}
         </div>

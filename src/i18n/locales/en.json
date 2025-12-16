@@ -1,0 +1,123 @@
+{
+  "header": {
+    "store_name": "ARDA Store",
+    "search_placeholder": "Search for products...",
+    "more": "See more",
+    "all_categories": "All categories"
+  },
+  "hero": {
+    "slide1": {
+      "title": "Welcome to ARDA Store",
+      "subtitle": "Discover our quality products at unbeatable prices",
+      "cta": "View products"
+    },
+    "slide2": {
+      "title": "Fast Delivery",
+      "subtitle": "Receive your orders in 24-48h anywhere in Qatar",
+      "cta": "Order now"
+    },
+    "slide3": {
+      "title": "24/7 Customer Service",
+      "subtitle": "Our team is always here to help you",
+      "cta": "Contact us"
+    }
+  },
+  "product": {
+    "section_title": "Our Products",
+    "search_results": "Results for",
+    "no_products_found": "No products found",
+    "loading_error": "An error occurred while loading products",
+    "similar_products": "Similar Products",
+    "read_more": "Read more",
+    "read_less": "Read less",
+    "add_to_cart": "Add to Cart",
+    "out_of_stock": "Out of Stock",
+    "in_stock": "In Stock",
+    "view_details": "View Details",
+    "quick_order": "Order Now",
+    "description": "Description",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "buy_now": "Buy Now",
+    "select_color": "Select a color",
+    "back_to_products": "Back to products"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "continue_shopping": "Continue shopping",
+    "view_cart": "View Cart",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "items_count": "item(s)"
+  },
+  "order": {
+    "title": "Place your order",
+    "order_summary": "Order Summary",
+    "customer_info": "Customer Information",
+    "name": "Full Name",
+    "phone": "Phone",
+    "address": "Delivery Address",
+    "street_number": "Street Number",
+    "area_number": "Area Number",
+    "villa_number": "Villa Number",
+    "notes": "Notes",
+    "notes_optional": "Notes (optional)",
+    "shipping_method": "Shipping Method",
+    "standard": "Standard (3-5 days)",
+    "express": "Express (24-48h)",
+    "payment_method": "Payment Method",
+    "cash_on_delivery": "Cash on Delivery",
+    "submit": "Confirm Order",
+    "success": "Order confirmed!",
+    "error": "Error placing order"
+  },
+  "footer": {
+    "free_shipping": "Free Shipping",
+    "free_shipping_desc": "For all orders",
+    "easy_return": "Easy Return",
+    "easy_return_desc": "1 day to change your mind",
+    "cash_on_delivery": "Cash on Delivery",
+    "cash_on_delivery_desc": "Cash only upon delivery",
+    "support_24_7": "24/7 Support",
+    "support_24_7_desc": "Dedicated customer support",
+    "store_title": "Sheikh Store",
+    "store_description": "Your trusted destination for electronics, cosmetics and luxury fashion",
+    "address": "Qatar, Doha",
+    "about": "About",
+    "about_text": "ARDA Store - Your trusted online shop for quality products.",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "quick_links": "Quick Links",
+    "home": "Home",
+    "products": "Products",
+    "about_us": "About Us",
+    "return_policy": "Return Policy",
+    "terms_of_use": "Terms of Use",
+    "privacy": "Privacy",
+    "contact_us": "Contact",
+    "follow_us": "Follow Us",
+    "customer_service": "Customer Service",
+    "working_hours": "Working Hours",
+    "hours_24_7": "7/24",
+    "help": "Help",
+    "live_chat": "Live chat available",
+    "payment_method": "Payment method:",
+    "cash_payment": "Cash on delivery",
+    "rights": "All rights reserved"
+  },
+  "common": {
+    "language": "Language",
+    "currency": "DH",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}

@@ -1,10 +1,17 @@
-import { ShoppingCart, Search, Globe, Menu, X, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Search, Globe, Menu, X, ChevronDown, Store } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useShop } from '@/contexts/ShopContext';
 import { Category } from '@/models/types';
+import { useTranslation } from 'react-i18next';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface HeaderProps {
   categories: Category[];
@@ -23,25 +30,34 @@ export function Header({
   searchQuery,
   onSearchChange,
 }: HeaderProps) {
-  const { language, setLanguage, toggleCart, getCartItemsCount, t, setCartOpen } = useShop();
+  const { getCartItemsCount, setCartOpen } = useShop();
+  const { t, i18n } = useTranslation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   const cartItemsCount = getCartItemsCount();
-
   const visibleCategories = categories.slice(0, MAX_VISIBLE_CATEGORIES);
   const moreCategories = categories.slice(MAX_VISIBLE_CATEGORIES);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="container">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gradient">ARDA Store</h1>
+          <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center shadow-lg">
+                <Store className="h-6 w-6 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {t('header.store_name')}
+              </h1>
+            </div>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-2">
             {visibleCategories.map((category) => (
               <button
@@ -62,7 +78,7 @@ export function Header({
                   onClick={() => setIsMoreOpen((open) => !open)}
                   className="flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
                 >
-                  {t('more') || 'Voir plus'}
+                  {t('header.more')}
                   <ChevronDown className="ml-1 h-4 w-4" />
                 </button>
                 {isMoreOpen && (
@@ -92,12 +108,11 @@ export function Header({
             )}
           </nav>
 
-          {/* Search Bar */}
           <div className="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder={t('search')}
+                placeholder={t('header.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="pl-10"
@@ -105,9 +120,26 @@ export function Header({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center space-x-4">
-            {/* Cart */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="bg-background border-border">
+                  <Globe className="h-4 w-4 mr-2" />
+                  {i18n.language === 'ar' ? 'العربية' : 'English'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-background">
+                <DropdownMenuItem onClick={() => changeLanguage('ar')} className="cursor-pointer">
+                  <span className="mr-2">🇶🇦</span>
+                  العربية
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('en')} className="cursor-pointer">
+                  <span className="mr-2">🇬🇧</span>
+                  English
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               variant="ghost"
               size="sm"
@@ -125,7 +157,6 @@ export function Header({
               )}
             </Button>
 
-            {/* Mobile Menu Toggle */}
             <Button
               variant="ghost"
               size="sm"
@@ -137,22 +168,19 @@ export function Header({
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-border py-4">
             <div className="space-y-4">
-              {/* Mobile Search */}
               <div className="md:hidden relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder={t('search')}
+                  placeholder={t('header.search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
                   className="pl-10"
                 />
               </div>
 
-              {/* Mobile Navigation */}
               <nav className="flex flex-col space-y-2">
                 {categories.map((category) => (
                   <button

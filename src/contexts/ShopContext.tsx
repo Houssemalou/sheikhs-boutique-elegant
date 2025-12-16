@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { Language,} from '@/types';
 import { toast } from '@/hooks/use-toast';
 import { ProductDTO, CartItem } from '@/models/types';
 
 interface ShopState {
   cartItems: CartItem[];
-  language: Language;
   isCartOpen: boolean;
 }
 
@@ -14,14 +12,12 @@ type ShopAction =
   | { type: 'REMOVE_FROM_CART'; payload: any }
   | { type: 'UPDATE_QUANTITY'; payload: { productId: number; quantity: number } }
   | { type: 'CLEAR_CART' }
-  | { type: 'SET_LANGUAGE'; payload: Language }
   | { type: 'TOGGLE_CART' }
   | { type: 'SET_CART_OPEN'; payload: boolean }
   | { type: 'LOAD_CART'; payload: CartItem[] };
 
 const initialState: ShopState = {
   cartItems: [],
-  language: 'ar',
   isCartOpen: false,
 };
 
@@ -68,11 +64,6 @@ function shopReducer(state: ShopState, action: ShopAction): ShopState {
         ...state,
         cartItems: [],
       };
-    case 'SET_LANGUAGE':
-      return {
-        ...state,
-        language: action.payload,
-      };
     case 'TOGGLE_CART':
       return {
         ...state,
@@ -98,70 +89,13 @@ interface ShopContextType extends ShopState {
   removeFromCart: (productId: any) => void;
   updateQuantity: (productId: any, quantity: number) => void;
   clearCart: () => void;
-  setLanguage: (language: Language) => void;
   toggleCart: () => void;
   setCartOpen: (open: boolean) => void;
   getCartTotal: () => number;
   getCartItemsCount: () => number;
-  t: (key: string) => string;
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
-
-const translations = {
-  fr: {
-    'add-to-cart': 'Ajouter au panier',
-    'view-cart': 'Voir le panier',
-    'checkout': 'Passer la commande',
-    'cart-empty': 'Votre panier est vide',
-    'continue-shopping': 'Continuer vos achats',
-    'remove': 'Supprimer',
-    'quantity': 'Quantité',
-    'total': 'Total',
-    'electronics': 'Électronique',
-    'cosmetics': 'Cosmétiques',
-    'fashion': 'Mode',
-    'home': 'Maison',
-    'all-categories': 'Toutes catégories',
-    'search': 'Rechercher...',
-    'currency': 'DH',
-    'in-stock': 'En stock',
-    'out-of-stock': 'Rupture de stock',
-    'free-shipping': 'Livraison gratuite',
-    'fast-delivery': 'Livraison rapide',
-    '24h-support': 'Support 24h/24',
-    'easy-returns': 'Retours faciles',
-    'product-added': 'Produit ajouté au panier',
-  'show-more': 'Voir plus',
-  'show-less': 'Voir moins',
-  },
-  ar: {
-    'add-to-cart': 'أضف إلى السلة(Add to Cart)',
-    'view-cart': 'عرض السلة',
-    'checkout': 'الدفع',
-    'cart-empty': 'سلتك فارغة',
-    'continue-shopping': 'متابعة التسوق',
-    'remove': 'إزالة',
-    'quantity': 'الكمية',
-    'total': 'المجموع',
-    'electronics': 'الإلكترونيات',
-    'cosmetics': 'مستحضرات التجميل',
-    'fashion': 'الأزياء',
-    'home': 'المنزل',
-    'all-categories': 'جميع الفئات',
-    'search': 'بحث...',
-    'currency': 'ر.ق',
-    'in-stock': 'متوفر',
-    'out-of-stock': 'نفد من المخزون',
-    'free-shipping': 'شحن مجاني',
-    'fast-delivery': 'توصيل سريع',
-    '24h-support': 'دعم ٢٤/٧',
-    'easy-returns': 'إرجاع سهل',
-    'product-added': 'تم إضافة المنتج إلى السلة',
-  'show-more': 'عرض المزيد',
-  'show-less': 'عرض أقل',
-  },
-};
 
 export function ShopProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(shopReducer, initialState);
@@ -177,11 +111,6 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         console.error('Error loading cart from localStorage:', error);
       }
     }
-
-    const savedLanguage = localStorage.getItem('sheikh-store-language') as Language;
-    if (savedLanguage) {
-      dispatch({ type: 'SET_LANGUAGE', payload: savedLanguage });
-    }
   }, []);
 
   // Save cart to localStorage whenever it changes
@@ -189,18 +118,11 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('sheikh-store-cart', JSON.stringify(state.cartItems));
   }, [state.cartItems]);
 
-  // Save language to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('sheikh-store-language', state.language);
-    document.documentElement.setAttribute('dir', state.language === 'ar' ? 'rtl' : 'ltr');
-    document.documentElement.setAttribute('lang', state.language);
-  }, [state.language]);
-
   const addToCart = (product: ProductDTO, quantity = 1, selectedColor?: string) => {
     dispatch({ type: 'ADD_TO_CART', payload: { product, quantity, selectedColor } });
     toast({
-      title: translations[state.language]['product-added'],
-      description: product.name[state.language],
+      title: '✓ Produit ajouté',
+      description: product.name,
     });
   };
 
@@ -214,10 +136,6 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
-  };
-
-  const setLanguage = (language: Language) => {
-    dispatch({ type: 'SET_LANGUAGE', payload: language });
   };
 
   const toggleCart = () => {
@@ -236,10 +154,6 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     return state.cartItems.reduce((count, item) => count + item.quantity, 0);
   };
 
-  const t = (key: string) => {
-    return translations[state.language][key as keyof typeof translations['fr']] || key;
-  };
-
   return (
     <ShopContext.Provider
       value={{
@@ -248,12 +162,10 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
-        setLanguage,
         toggleCart,
         setCartOpen,
         getCartTotal,
         getCartItemsCount,
-        t,
       }}
     >
       {children}

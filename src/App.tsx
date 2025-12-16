@@ -6,22 +6,44 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ShopProvider } from "@/contexts/ShopContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import ProductDetails from "./pages/ProductDetails";
+import "./i18n/config";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const queryClient = new QueryClient();
+
+function AppContent() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    // Update document direction based on language
+    const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = dir;
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ShopProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppContent />
       </TooltipProvider>
     </ShopProvider>
   </QueryClientProvider>

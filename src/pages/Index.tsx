@@ -8,15 +8,16 @@ import { Footer } from "@/components/Footer";
 import { useShop } from "@/contexts/ShopContext";
 import { getCategories } from "@/services/productsService";
 import { CategoryResDTO, ProductDTO } from "@/models/types";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 30000]);
   const [sortBy, setSortBy] = useState<"name" | "price-low" | "price-high">(
     "name"
   );
-  const { language } = useShop();
 
   // Récupérer catégories + produits
   const {
@@ -117,11 +118,11 @@ console.log("All Products:", groupedProducts);
             {/* Section Header */}
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                منتجاتنا
+                {t('product.section_title')}
               </h2>
               {searchQuery && (
                 <p className="text-muted-foreground">
-                  {`النتائج لـ ${searchQuery}`}
+                  {t('product.search_results')} {searchQuery}
                 </p>
               )}
             </div>
@@ -137,7 +138,7 @@ console.log("All Products:", groupedProducts);
             {error && (
               <div className="text-center text-red-600 py-16">
                 <p>
-                   حدث خطأ أثناء تحميل المنتجات
+                   {t('product.loading_error')}
                 </p>
               </div>
             )}
@@ -179,7 +180,7 @@ console.log("All Products:", groupedProducts);
                 ) : (
                   <div className="text-center py-16">
                     <h3 className="text-xl font-semibold mb-2">
-                      لم يتم العثور على منتجات
+                      {t('product.no_products_found')}
                     </h3>
                   </div>
                 )}
