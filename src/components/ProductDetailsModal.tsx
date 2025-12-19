@@ -33,6 +33,9 @@ export function ProductDetailsModal({ product, isOpen, onClose }: ProductDetails
     ? product.images 
     : [product.photoPath];
 
+  console.log("All Images:", allImages);
+  console.log("Selected Image Index:", product.promo);
+
   const handleAddToCart = async () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 300));

@@ -237,7 +237,8 @@ export function PoliciesSection() {
             <div className="text-center md:text-left">
               <h3 className="text-2xl font-bold mb-2">Arda Store – أردا متجر</h3>
               <p className="text-muted-foreground mb-1">
-                <strong>Commercial Registration (CR):</strong> 24441
+                <strong>Commercial Registration (CR):</strong> 24441 <br />
+                <strong>Commercial Registration (CR):</strong> 13647
               </p>
               <p className="text-sm text-muted-foreground">
                 Applicable in the State of Qatar – فقط قطر – لن يكون للبيع

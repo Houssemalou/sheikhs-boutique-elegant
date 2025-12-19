@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Plus, Minus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,13 +15,6 @@ import { CategoryResDTO, ProductDTO } from '@/models/types';
 import { OrderForm } from '@/components/OrderForm';
 import { ProductCard } from '@/components/ProductCard';
 import { toast } from '@/hooks/use-toast';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -34,6 +27,8 @@ export default function ProductDetails() {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Récupérer le produit
   const { data: categories, isLoading } = useQuery<CategoryResDTO[], Error>({
@@ -77,6 +72,64 @@ export default function ProductDetails() {
 
   const isOutOfStock = product.stock === 0;
   const isPromo = product.discount !== 0;
+  
+  // Préparer les images (images du tableau ou photoPath par défaut)
+  const productImages = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.photoPath];
+
+  // Carousel automatique pour les produits similaires
+  const itemsPerSlide = {
+    mobile: 1,
+    tablet: 2,
+    desktop: 3,
+    large: 4
+  };
+
+  const getItemsPerSlide = () => {
+    if (typeof window === 'undefined') return itemsPerSlide.desktop;
+    const width = window.innerWidth;
+    if (width < 640) return itemsPerSlide.mobile;
+    if (width < 768) return itemsPerSlide.tablet;
+    if (width < 1024) return itemsPerSlide.desktop;
+    return itemsPerSlide.large;
+  };
+
+  const [itemsToShow, setItemsToShow] = useState(getItemsPerSlide());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsToShow(getItemsPerSlide());
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const totalSlides = Math.ceil(similarProducts.length / itemsToShow);
+
+  useEffect(() => {
+    if (similarProducts.length === 0) return;
+    
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, 4000);
+    
+    return () => clearInterval(timer);
+  }, [totalSlides, similarProducts.length]);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  };
+
+  const getCurrentProducts = () => {
+    const startIndex = currentSlide * itemsToShow;
+    return similarProducts.slice(startIndex, startIndex + itemsToShow);
+  };
 
   const handleAddToCart = async () => {
     if (isOutOfStock) return;
@@ -158,7 +211,7 @@ export default function ProductDetails() {
                 <Card className="overflow-hidden">
                   <div className="aspect-square relative">
                     <img
-                      src={product.photoPath}
+                      src={productImages[selectedImageIndex]}
                       alt={product.name}
                       className="w-full h-full object-cover"
                     />
@@ -183,6 +236,29 @@ export default function ProductDetails() {
                     </div>
                   </div>
                 </Card>
+                
+                {/* Thumbnails */}
+                {productImages.length > 1 && (
+                  <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+                    {productImages.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                          selectedImageIndex === index 
+                            ? 'border-primary ring-2 ring-primary/20' 
+                            : 'border-gray-200 hover:border-primary/50'
+                        }`}
+                      >
+                        <img
+                          src={image}
+                          alt={`${product.name} - ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Info Section */}
@@ -310,15 +386,31 @@ export default function ProductDetails() {
                     {isAddingToCart ? t('common.loading') : t('product.add_to_cart')}
                   </Button>
                   
-                  <Button
-                    size="lg"
-                    variant="secondary"
-                    onClick={handleBuyNow}
-                    disabled={isOutOfStock || isBuyingNow}
-                    className="w-full"
-                  >
-                    {isBuyingNow ? t('common.loading') : t('product.buy_now')}
-                  </Button>
+                  {/* Promo Card - Buy 3 Get 1 Free */}
+                  {product.promo && (
+                    <Card className="overflow-hidden border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 animate-in slide-in-from-bottom duration-700">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="text-4xl animate-bounce">🎁</div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-green-700 dark:text-green-400 mb-1">
+                              {t('product.buy_3_get_1')}
+                            </h3>
+                            <p className="text-sm text-green-600 dark:text-green-500">
+                              {t('common.currency') === 'د.ت' 
+                                ? 'عرض خاص لفترة محدودة' 
+                                : 'Special offer for a limited time'}
+                            </p>
+                          </div>
+                          <div className="text-green-600 dark:text-green-400 animate-pulse">
+                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </div>
             </div>
@@ -340,31 +432,83 @@ export default function ProductDetails() {
 
         {/* Similar Products Section */}
         {similarProducts.length > 0 && (
-          <div className="mt-16">
-            <div className="mb-8">
+          <div className="mt-16 px-4 sm:px-6 md:px-0">
+            <div className="mb-8 text-center md:text-left">
               <h2 className="text-2xl md:text-3xl font-bold mb-2">
                 {t('product.similar_products')}
               </h2>
-              <div className="w-20 h-1 bg-gradient-to-r from-primary to-primary/60 rounded-full"></div>
+              <div className="w-20 h-1 bg-gradient-to-r from-primary to-primary/60 rounded-full mx-auto md:mx-0"></div>
             </div>
 
-            <Carousel
-              opts={{
-                align: "start",
-                loop: false,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {similarProducts.map((similarProduct) => (
-                  <CarouselItem key={similarProduct.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                    <ProductCard product={similarProduct} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="-left-4" />
-              <CarouselNext className="-right-4" />
-            </Carousel>
+            {/* HTML Native Carousel */}
+            <div className="relative">
+              <div className="overflow-hidden">
+                {/* Slides Container */}
+                <div className="relative">
+                  {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+                    <div
+                      key={slideIndex}
+                      className={`transition-all duration-500 ease-in-out ${
+                        slideIndex === currentSlide 
+                          ? 'opacity-100 relative' 
+                          : 'opacity-0 absolute inset-0 pointer-events-none'
+                      }`}
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-2">
+                        {similarProducts
+                          .slice(slideIndex * itemsToShow, (slideIndex + 1) * itemsToShow)
+                          .map((similarProduct) => (
+                            <div key={similarProduct.id} className="w-full flex justify-center">
+                              <div className="w-full max-w-xs">
+                                <ProductCard product={similarProduct} />
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation Arrows */}
+              {totalSlides > 1 && (
+                <>
+                  <button
+                    onClick={prevSlide}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 p-2 md:p-3 rounded-full transition-all duration-300 hover:scale-110"
+                    aria-label="Previous"
+                  >
+                    <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+                  </button>
+                  
+                  <button
+                    onClick={nextSlide}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 p-2 md:p-3 rounded-full transition-all duration-300 hover:scale-110"
+                    aria-label="Next"
+                  >
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+                  </button>
+                </>
+              )}
+
+              {/* Dots Indicator */}
+              {totalSlides > 1 && (
+                <div className="flex justify-center gap-2 mt-6">
+                  {Array.from({ length: totalSlides }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`transition-all duration-300 rounded-full ${
+                        index === currentSlide 
+                          ? 'w-8 h-2 bg-primary' 
+                          : 'w-2 h-2 bg-gray-300 dark:bg-gray-600 hover:bg-primary/50'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
