@@ -21,7 +21,8 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { addToCart, setCartOpen } = useShop();
-  
+
+  // Déclarer tous les hooks en haut du composant
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState<string | undefined>();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -30,17 +31,34 @@ export default function ProductDetails() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Récupérer le produit
+  // Pour le carousel responsive
+  const itemsPerSlide = {
+    mobile: 1,
+    tablet: 2,
+    desktop: 3,
+    large: 4
+  };
+  const getItemsPerSlide = () => {
+    if (typeof window === 'undefined') return itemsPerSlide.desktop;
+    const width = window.innerWidth;
+    if (width < 640) return itemsPerSlide.mobile;
+    if (width < 768) return itemsPerSlide.tablet;
+    if (width < 1024) return itemsPerSlide.desktop;
+    return itemsPerSlide.large;
+  };
+  const [itemsToShow, setItemsToShow] = useState(getItemsPerSlide());
+
+  // Récupérer les catégories et produits
   const { data: categories, isLoading } = useQuery<CategoryResDTO[], Error>({
     queryKey: ['categories'],
     queryFn: getCategories,
   });
 
+  // Calculer le produit et les produits similaires
   const product = categories
     ?.flatMap((cat) => cat.products)
     .find((p) => p.id === Number(id));
 
-  // Récupérer les produits similaires (même catégorie)
   const similarProducts = categories
     ?.flatMap((cat) => cat.products)
     .filter(
@@ -50,6 +68,28 @@ export default function ProductDetails() {
     )
     .slice(0, 8) || [];
 
+  // Calculer le nombre de slides pour le carousel
+  const totalSlides = Math.ceil(similarProducts.length / itemsToShow);
+
+  // Effet pour le responsive du carousel
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsToShow(getItemsPerSlide());
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Effet pour l'auto-slide du carousel
+  useEffect(() => {
+    if (similarProducts.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [totalSlides, similarProducts.length]);
+
+  // Les returns conditionnels doivent venir après tous les hooks
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -62,7 +102,7 @@ export default function ProductDetails() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold mb-4">Produit non trouvé</h1>
-        <Button onClick={() => navigate('/')}>
+        <Button onClick={() => navigate('/')}> 
           <ArrowLeft className="mr-2 h-4 w-4" />
           {t('product.back_to_products')}
         </Button>
@@ -79,44 +119,7 @@ export default function ProductDetails() {
     : [product.photoPath];
 
   // Carousel automatique pour les produits similaires
-  const itemsPerSlide = {
-    mobile: 1,
-    tablet: 2,
-    desktop: 3,
-    large: 4
-  };
-
-  const getItemsPerSlide = () => {
-    if (typeof window === 'undefined') return itemsPerSlide.desktop;
-    const width = window.innerWidth;
-    if (width < 640) return itemsPerSlide.mobile;
-    if (width < 768) return itemsPerSlide.tablet;
-    if (width < 1024) return itemsPerSlide.desktop;
-    return itemsPerSlide.large;
-  };
-
-  const [itemsToShow, setItemsToShow] = useState(getItemsPerSlide());
-
-  useEffect(() => {
-    const handleResize = () => {
-      setItemsToShow(getItemsPerSlide());
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const totalSlides = Math.ceil(similarProducts.length / itemsToShow);
-
-  useEffect(() => {
-    if (similarProducts.length === 0) return;
-    
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 4000);
-    
-    return () => clearInterval(timer);
-  }, [totalSlides, similarProducts.length]);
+  // ...existing code...
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);

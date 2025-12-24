@@ -241,7 +241,7 @@ export function PoliciesSection() {
                 <strong>Commercial Registration (CR):</strong> 13647
               </p>
               <p className="text-sm text-muted-foreground">
-                Applicable in the State of Qatar – فقط قطر – لن يكون للبيع
+                Applicable in the State of Qatar فقط قطر 
               </p>
             </div>
             <div className="flex-shrink-0">

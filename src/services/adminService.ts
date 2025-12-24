@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from "../api/apiClient";
 
 export const addProductImages = async (productId: number, images: File[]) => {
   const formData = new FormData();
