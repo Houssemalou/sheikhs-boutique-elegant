@@ -227,8 +227,7 @@ export default function ProductDetails() {
                             ((product.originalPrice - product.price) /
                               product.originalPrice) *
                               100
-                          )}
-                          %
+                          )}%
                         </Badge>
                       )}
                       {isOutOfStock && (
@@ -240,26 +239,28 @@ export default function ProductDetails() {
                   </div>
                 </Card>
                 
-                {/* Thumbnails */}
+                {/* Thumbnails - maximum 4 visibles, scroll pour les autres */}
                 {productImages.length > 1 && (
-                  <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
-                    {productImages.map((image, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                          selectedImageIndex === index 
-                            ? 'border-primary ring-2 ring-primary/20' 
-                            : 'border-gray-200 hover:border-primary/50'
-                        }`}
-                      >
-                        <img
-                          src={image}
-                          alt={`${product.name} - ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+                  <div className="mt-4 max-w-[280px] sm:max-w-[352px] overflow-x-auto pb-2">
+                    <div className="flex gap-2">
+                      {productImages.map((image, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImageIndex(index)}
+                          className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                            selectedImageIndex === index 
+                              ? 'border-primary ring-2 ring-primary/20' 
+                              : 'border-gray-200 hover:border-primary/50'
+                          }`}
+                        >
+                          <img
+                            src={image}
+                            alt={`${product.name} - ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
