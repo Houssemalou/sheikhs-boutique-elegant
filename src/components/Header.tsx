@@ -1,10 +1,9 @@
-import { ShoppingCart, Search, Globe, Menu, X, ChevronDown, Store } from 'lucide-react';
+import { ShoppingCart, Globe, Menu, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useShop } from '@/contexts/ShopContext';
-import { Category } from '@/models/types';
+import { Category, ProductDTO } from '@/models/types';
 import { useTranslation } from 'react-i18next';
 import {
   DropdownMenu,
@@ -12,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SearchBar } from '@/components/SearchBar';
 
 interface HeaderProps {
   categories: Category[];
@@ -19,6 +19,7 @@ interface HeaderProps {
   onCategoryChange: (categoryId: string | number) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  allProducts?: ProductDTO[];
 }
 
 const MAX_VISIBLE_CATEGORIES = 5;
@@ -29,6 +30,7 @@ export function Header({
   onCategoryChange,
   searchQuery,
   onSearchChange,
+  allProducts = [],
 }: HeaderProps) {
   const { getCartItemsCount, setCartOpen } = useShop();
   const { t, i18n } = useTranslation();
@@ -108,15 +110,12 @@ export function Header({
           </nav>
 
           <div className="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder={t('header.search_placeholder')}
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={onSearchChange}
+              allProducts={allProducts}
+              className="flex-1"
+            />
           </div>
 
           <div className="flex items-center space-x-4">
@@ -170,16 +169,6 @@ export function Header({
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-border py-4">
             <div className="space-y-4">
-              <div className="md:hidden relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder={t('header.search_placeholder')}
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-
               <nav className="flex flex-col space-y-2">
                 {categories.map((category) => (
                   <button
@@ -201,6 +190,18 @@ export function Header({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Barre de recherche mobile - toujours visible sur petits écrans */}
+      <div className="md:hidden border-b border-border bg-background/95 backdrop-blur">
+        <div className="container py-3">
+          <SearchBar
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            allProducts={allProducts}
+            className="w-full"
+          />
+        </div>
       </div>
     </header>
   );

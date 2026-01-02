@@ -25,6 +25,7 @@
   "product": {
     "section_title": "Our Products",
     "search_results": "Results for",
+    "results_found": "results found",
     "no_products_found": "No products found",
     "loading_error": "An error occurred while loading products",
     "similar_products": "Similar Products",

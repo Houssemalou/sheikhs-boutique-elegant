@@ -25,6 +25,7 @@
   "product": {
     "section_title": "منتجاتنا",
     "search_results": "النتائج لـ",
+    "results_found": "نتيجة",
     "no_products_found": "لم يتم العثور على منتجات",
     "loading_error": "حدث خطأ أثناء تحميل المنتجات",
     "similar_products": "منتجات مماثلة",

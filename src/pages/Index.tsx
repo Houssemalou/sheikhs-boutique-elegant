@@ -89,8 +89,11 @@ const Index = () => {
   return grouped;
 }, [categories, searchQuery, priceRange, sortBy]);
 
-// 👇 Ici le log est OK (après calcul)
-console.log("All Products:", groupedProducts);
+  // Récupérer tous les produits pour la recherche
+  const allProducts = useMemo(() => {
+    if (!categories) return [];
+    return categories.flatMap((c) => c.products);
+  }, [categories]);
 
   const scrollToCategory = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -110,6 +113,7 @@ console.log("All Products:", groupedProducts);
         onCategoryChange={scrollToCategory}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        allProducts={allProducts}
       />
 
       <main className="flex-1">
