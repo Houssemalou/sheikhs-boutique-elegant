@@ -1,4 +1,7 @@
 {
+  "banner": {
+    "free_shipping": "🎉 FREE SHIPPING on all orders!"
+  },
   "header": {
     "store_name": "ARDA Store",
     "search_placeholder": "Search for products...",
@@ -124,6 +127,13 @@
     "return_desc": "You can return or exchange products within 24 hours of delivery, provided the item is unused and in its original condition.",
     "download_button": "Download Complete Policy",
     "download_info": "Get the full document with all our policies in PDF format"
+  },
+  "orderConfirmation": {
+    "title": "Order Received!",
+    "message": "Thank you for your order. We have received it and will contact you as soon as possible to confirm the details.",
+    "contact_info": "Our team will reach out to you within 24 hours to confirm your order and arrange delivery.",
+    "back_to_home": "Back to Home",
+    "continue_shopping": "Continue Shopping"
   },
   "common": {
     "language": "Language",

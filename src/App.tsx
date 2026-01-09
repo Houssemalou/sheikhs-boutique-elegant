@@ -7,6 +7,7 @@ import { ShopProvider } from "@/contexts/ShopContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductDetails from "./pages/ProductDetails";
+import OrderConfirmation from "./pages/OrderConfirmation";
 import "./i18n/config";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -31,6 +32,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

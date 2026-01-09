@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -37,6 +38,7 @@ export function OrderForm({
   const [isOpen, setIsOpen] = useState(initialItems ? true : false);
   const { cartItems, clearCart } = useShop();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const form = useForm<OrderFormData>();
 
   // Use initialItems if provided, otherwise use cart items
@@ -58,14 +60,8 @@ export function OrderForm({
       if (!initialItems) {
         clearCart();
       }
-      toast({
-        title: '✓ ' + t('order.success'),
-        description: t('order.success'),
-      });
-      form.reset();
-      setIsOpen(false);
-      if (inline && onCancel) onCancel();
-      if (onClose) onClose();
+      // Redirect to confirmation page
+      navigate('/order-confirmation');
     },
     onError: (error) => {
       toast({
