@@ -31,6 +31,8 @@ export default function ProductDetails() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [thumbnailStartIndex, setThumbnailStartIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Pour le carousel responsive
   const itemsPerSlide = {
@@ -48,6 +50,9 @@ export default function ProductDetails() {
     return itemsPerSlide.large;
   };
   const [itemsToShow, setItemsToShow] = useState(getItemsPerSlide());
+
+  // Nombre de miniatures visibles selon la taille d'écran
+  const visibleThumbnails = isMobile ? 3 : 100;
 
   // Récupérer les catégories et produits
   const { data: categories, isLoading } = useQuery<CategoryResDTO[], Error>({
@@ -76,7 +81,10 @@ export default function ProductDetails() {
   useEffect(() => {
     const handleResize = () => {
       setItemsToShow(getItemsPerSlide());
+      setIsMobile(window.innerWidth < 640);
     };
+    // Initial check
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -235,39 +243,92 @@ export default function ProductDetails() {
                 </div>
               </div>
 
-              {/* Miniatures */}
+              {/* Miniatures - Slider avec navigation */}
               {productImages.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {productImages.map((image, index) => (
+                <div className="relative">
+                  {/* Bouton précédent */}
+                  {productImages.length > visibleThumbnails && thumbnailStartIndex > 0 && (
                     <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                        selectedImageIndex === index 
-                          ? 'border-primary ring-2 ring-primary/20' 
-                          : 'border-gray-200 hover:border-primary/50'
-                      }`}
+                      onClick={() => setThumbnailStartIndex(Math.max(0, thumbnailStartIndex - 1))}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-lg rounded-full p-2 transition-all"
                     >
-                      <img
-                        src={image}
-                        alt={`${product.name} - ${index + 1}`}
-                        className="w-full h-full object-contain bg-white"
-                      />
+                      <ChevronLeft className="h-5 w-5 text-gray-700" />
                     </button>
-                  ))}
+                  )}
+
+                  {/* Container des miniatures */}
+                  <div className="flex gap-2 overflow-hidden px-8 md:px-0">
+                    {productImages
+                      .slice(
+                        thumbnailStartIndex,
+                        thumbnailStartIndex + visibleThumbnails
+                      )
+                      .map((image, displayIndex) => {
+                        const actualIndex = thumbnailStartIndex + displayIndex;
+                        return (
+                          <button
+                            key={actualIndex}
+                            onClick={() => setSelectedImageIndex(actualIndex)}
+                            className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                              selectedImageIndex === actualIndex
+                                ? 'border-primary ring-2 ring-primary/20'
+                                : 'border-gray-200 hover:border-primary/50'
+                            }`}
+                          >
+                            <img
+                              src={image}
+                              alt={`${product.name} - ${actualIndex + 1}`}
+                              className="w-full h-full object-contain bg-white"
+                            />
+                          </button>
+                        );
+                      })}
+                  </div>
+
+                  {/* Bouton suivant */}
+                  {productImages.length > visibleThumbnails && 
+                   thumbnailStartIndex < productImages.length - visibleThumbnails && (
+                    <button
+                      onClick={() => setThumbnailStartIndex(
+                        Math.min(
+                          productImages.length - visibleThumbnails,
+                          thumbnailStartIndex + 1
+                        )
+                      )}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-lg rounded-full p-2 transition-all"
+                    >
+                      <ChevronRight className="h-5 w-5 text-gray-700" />
+                    </button>
+                  )}
+
+                  {/* Indicateur de position (seulement sur mobile quand il y a plus de 3 images) */}
+                  {productImages.length > 3 && isMobile && (
+                    <div className="flex justify-center gap-1 mt-2 md:hidden">
+                      {Array.from({ length: Math.ceil(productImages.length / 3) }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-1.5 rounded-full transition-all ${
+                            Math.floor(thumbnailStartIndex / 3) === i
+                              ? 'w-6 bg-primary'
+                              : 'w-1.5 bg-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
             {/* Right Column: Info & Order Form */}
-            <div className="p-6 md:p-8 bg-gray-50 border-l">
+            <div className="p-8 md:p-8 bg-gray-50 border-l">
               {/* Product Title */}
-              <h1 className="text-2xl md:text-3xl font-bold mb-4">
+              <h1 className="text-2xl md:text-3xl font-bold mb-4 text-center lg:text-right">
                 {product.name}
               </h1>
 
               {/* Price */}
-              <div className="flex items-baseline gap-3 mb-6">
+              <div className="flex items-baseline justify-center lg:justify-end gap-3 mb-6">
                 <span className="text-3xl md:text-4xl font-bold text-green-600">
                   {t('common.currency')} {product.price.toFixed(2)}
                 </span>
@@ -295,9 +356,9 @@ export default function ProductDetails() {
 
               {/* Promo Badge */}
               {product.promo && (
-                <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-4">
+                <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-3">
                   <div className="flex items-center gap-3">
-                    <div className="text-3xl">🎁</div>
+                    <div className="text-2xl">🎁</div>
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-green-700">
                         {t('product.buy_3_get_1')}

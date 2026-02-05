@@ -118,7 +118,7 @@ export function OrderForm({
   if (itemsToOrder.length === 0) return null;
 
   const innerContent = (
-    <div className="max-w-2xl">
+    <div className={inline ? "w-full" : "max-w-2xl"}>
       <div className="grid grid-cols-1 gap-6">
         {/* Order Form */}
         <Form {...form}>
