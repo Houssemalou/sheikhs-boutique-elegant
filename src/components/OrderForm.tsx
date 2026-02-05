@@ -120,31 +120,6 @@ export function OrderForm({
   const innerContent = (
     <div className="max-w-2xl">
       <div className="grid grid-cols-1 gap-6">
-        {/* Order Summary */}
-        <div>
-          <h3 className="font-semibold mb-4">{labels.orderSummary}</h3>
-          <div className="space-y-3 mb-4">
-            {itemsToOrder.map((item) => (
-              <div key={`${item.product.id}-${item.selectedColor}`} className="flex justify-between text-sm">
-                <span className="flex-1">
-                  {item.product.name}
-                  {item.selectedColor && <span className="text-muted-foreground"> - {item.selectedColor}</span>}
-                  <span className="text-muted-foreground"> x{item.quantity}</span>
-                </span>
-                <span className="font-medium">
-                  {(item.product.price * item.quantity).toLocaleString()} {t('common.currency')}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="border-t pt-3">
-            <div className="flex justify-between font-semibold">
-              <span>{t('cart.total')}</span>
-              <span>{calculateTotal().toLocaleString()} {t('common.currency')}</span>
-            </div>
-          </div>
-        </div>
-
         {/* Order Form */}
         <Form {...form}>
           <form
@@ -153,16 +128,16 @@ export function OrderForm({
             })}
             className="flex flex-col"
           >
-            <div className="space-y-3">
+            <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
                 rules={{ required: true }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.name}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">{labels.name}</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} placeholder={labels.name} className="border-gray-300 focus:border-primary" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -175,76 +150,82 @@ export function OrderForm({
                 rules={{ required: true }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.phone}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">{labels.phone}</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} placeholder={labels.phone} className="border-gray-300 focus:border-primary" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="streetNumber"
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{labels.streetNumber}</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <FormField
+                  control={form.control}
+                  name="streetNumber"
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">{labels.streetNumber}</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder={labels.streetNumber} className="border-gray-300 focus:border-primary" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="areaNumber"
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{labels.areaNumber}</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="areaNumber"
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">{labels.areaNumber}</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder={labels.areaNumber} className="border-gray-300 focus:border-primary" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="villaNumber"
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{labels.villaNumber}</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="villaNumber"
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-700">{labels.villaNumber}</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder={labels.villaNumber} className="border-gray-300 focus:border-primary" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{labels.notes}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-gray-700">{labels.notes}</FormLabel>
                     <FormControl>
-                      <Textarea {...field} className="min-h-[90px]" />
+                      <Textarea {...field} placeholder={labels.notes} className="min-h-[90px] border-gray-300 focus:border-primary" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            <div className="pt-4">
-              <Button type="submit" className="w-full" disabled={isPending}>
+            <div className="pt-6">
+              <Button 
+                type="submit" 
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 text-lg rounded-lg shadow-md" 
+                disabled={isPending}
+              >
                 {isPending ? t('common.loading') : labels.submitOrder}
               </Button>
             </div>

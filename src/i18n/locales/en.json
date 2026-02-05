@@ -67,6 +67,7 @@
     "name": "Full Name",
     "phone": "Phone",
     "address": "Delivery Address",
+    "city": "City",
     "street_number": "Street Number",
     "area_number": "Area Number",
     "villa_number": "Villa Number",
@@ -79,7 +80,8 @@
     "cash_on_delivery": "Cash on Delivery",
     "submit": "Confirm Order",
     "success": "Order confirmed!",
-    "error": "Error placing order"
+    "error": "Error placing order",
+    "order_message": "Please fill this form and we will contact you to confirm your order"
   },
   "footer": {
     "free_shipping": "Free Shipping",
@@ -137,7 +139,7 @@
   },
   "common": {
     "language": "Language",
-    "currency": "DH",
+    "currency": "QR",
     "loading": "Loading...",
     "error": "An error occurred",
     "close": "Close",

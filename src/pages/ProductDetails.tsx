@@ -14,6 +14,7 @@ import { getCategories } from '@/services/productsService';
 import { CategoryResDTO, ProductDTO } from '@/models/types';
 import { OrderForm } from '@/components/OrderForm';
 import { ProductCard } from '@/components/ProductCard';
+import { Footer } from '@/components/Footer';
 import { toast } from '@/hooks/use-toast';
 
 export default function ProductDetails() {
@@ -78,6 +79,7 @@ export default function ProductDetails() {
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Effet pour l'auto-slide du carousel
@@ -188,9 +190,9 @@ export default function ProductDetails() {
   const totalPrice = product.price * quantity;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header Navigation */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
+      <div className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="container py-4">
           <Button
             variant="ghost"
@@ -203,236 +205,154 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      {/* Product Details */}
-      <div className="container py-8">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Column: Product Info */}
-          <div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-8">
-              {/* Image Section */}
-              <div className="relative">
-                <Card className="overflow-hidden">
-                  <div className="aspect-square relative">
-                    <img
-                      src={productImages[selectedImageIndex]}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                    
-                    {/* Badges */}
-                    <div className="absolute top-4 left-4 flex flex-col gap-2">
-                      {isPromo && (
-                        <Badge className="bg-blue-600 text-white">
-                          -{Math.round(
-                            ((product.originalPrice - product.price) /
-                              product.originalPrice) *
-                              100
-                          )}%
-                        </Badge>
-                      )}
-                      {isOutOfStock && (
-                        <Badge className="bg-gray-600 text-white">
-                          {t('product.out_of_stock')}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-                
-                {/* Thumbnails - maximum 4 visibles, scroll pour les autres */}
-                {productImages.length > 1 && (
-                  <div className="mt-4 max-w-[280px] sm:max-w-[352px] overflow-x-auto pb-2">
-                    <div className="flex gap-2">
-                      {productImages.map((image, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedImageIndex(index)}
-                          className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                            selectedImageIndex === index 
-                              ? 'border-primary ring-2 ring-primary/20' 
-                              : 'border-gray-200 hover:border-primary/50'
-                          }`}
-                        >
-                          <img
-                            src={image}
-                            alt={`${product.name} - ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Info Section */}
-              <div className="flex flex-col gap-6">
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                    {product.name}
-                  </h1>
-                  {product.category && (
-                    <p className="text-muted-foreground">{product.category}</p>
-                  )}
-                </div>
-
-                <Separator />
-
-                {/* Price */}
-                <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-bold text-primary">
-                    {product.price.toFixed(2)} {t('common.currency')}
-                  </span>
-                  {isPromo && (
-                    <span className="text-xl text-muted-foreground line-through">
-                      {product.originalPrice.toFixed(2)} {t('common.currency')}
-                    </span>
-                  )}
-                </div>
-
-                {/* Stock Status */}
-                <div>
-                  {isOutOfStock ? (
-                    <Badge variant="destructive">{t('product.out_of_stock')}</Badge>
-                  ) : (
-                    <Badge variant="secondary">
-                      {t('product.in_stock')} ({product.stock})
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Description */}
-                {product.description && (
-                  <div>
-                    <h3 className="font-semibold mb-2">{t('product.description')}</h3>
-                    <div className="relative">
-                      <p className={`text-muted-foreground leading-relaxed ${
-                        !showFullDescription && product.description.length > 150 ? 'line-clamp-3' : ''
-                      }`}>
-                        {product.description}
-                      </p>
-                      {product.description.length > 150 && (
-                        <button
-                          onClick={() => setShowFullDescription(!showFullDescription)}
-                          className="text-primary text-sm font-medium hover:underline mt-2"
-                        >
-                          {showFullDescription ? t('product.read_less') : t('product.read_more')}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                <Separator />
-
-                {/* Quantity Selector */}
-                {!isOutOfStock && (
-                  <div className="space-y-2">
-                    <Label>{t('product.quantity')}</Label>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center border rounded-md">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={decrementQuantity}
-                          disabled={quantity <= 1}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <Input
-                          type="number"
-                          value={quantity}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value);
-                            if (val > 0 && val <= product.stock) {
-                              setQuantity(val);
-                            }
-                          }}
-                          className="w-20 text-center border-0 focus-visible:ring-0"
-                          min={1}
-                          max={product.stock}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={incrementQuantity}
-                          disabled={quantity >= product.stock}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <span className="text-muted-foreground">
-                        Max: {product.stock}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Total */}
-                {!isOutOfStock && (
-                  <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-                    <span className="font-semibold">{t('product.total')}</span>
-                    <span className="text-2xl font-bold text-primary">
-                      {totalPrice.toFixed(2)} {t('common.currency')}
-                    </span>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-3">
-                  <Button
-                    size="lg"
-                    onClick={handleAddToCart}
-                    disabled={isOutOfStock || isAddingToCart}
-                    className="w-full"
-                  >
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    {isAddingToCart ? t('common.loading') : t('product.add_to_cart')}
-                  </Button>
+      {/* Product Details - Nouveau Design Kotama */}
+      <div className="container py-6 md:py-10">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="grid lg:grid-cols-2 gap-0">
+            {/* Left Column: Images */}
+            <div className="p-6 md:p-8">
+              {/* Image principale */}
+              <div className="relative bg-white rounded-lg overflow-hidden mb-4">
+                <div className="aspect-square relative">
+                  <img
+                    src={productImages[selectedImageIndex]}
+                    alt={product.name}
+                    className="w-full h-full object-contain"
+                  />
                   
-                  {/* Promo Card - Buy 3 Get 1 Free */}
-                  {product.promo && (
-                    <Card className="overflow-hidden border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 animate-in slide-in-from-bottom duration-700">
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                          <div className="text-4xl animate-bounce">🎁</div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-green-700 dark:text-green-400 mb-1">
-                              {t('product.buy_3_get_1')}
-                            </h3>
-                            <p className="text-sm text-green-600 dark:text-green-500">
-                              {t('common.currency') === 'د.ت' 
-                                ? 'عرض خاص لفترة محدودة' 
-                                : 'Special offer for a limited time'}
-                            </p>
-                          </div>
-                          <div className="text-green-600 dark:text-green-400 animate-pulse">
-                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                            </svg>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                  {/* Badges */}
+                  {isPromo && (
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-red-600 text-white text-base px-3 py-1">
+                        -{Math.round(
+                          ((product.originalPrice - product.price) /
+                            product.originalPrice) *
+                            100
+                        )}%
+                      </Badge>
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Right Column: Order Form */}
-          <div>
-            <Card className="sticky top-20">
-              <CardContent className="pt-6">
-                <h2 className="text-2xl font-bold mb-6">{t('order.title')}</h2>
+              {/* Miniatures */}
+              {productImages.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {productImages.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                        selectedImageIndex === index 
+                          ? 'border-primary ring-2 ring-primary/20' 
+                          : 'border-gray-200 hover:border-primary/50'
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`${product.name} - ${index + 1}`}
+                        className="w-full h-full object-contain bg-white"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column: Info & Order Form */}
+            <div className="p-6 md:p-8 bg-gray-50 border-l">
+              {/* Product Title */}
+              <h1 className="text-2xl md:text-3xl font-bold mb-4">
+                {product.name}
+              </h1>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-3 mb-6">
+                <span className="text-3xl md:text-4xl font-bold text-green-600">
+                  {t('common.currency')} {product.price.toFixed(2)}
+                </span>
+                {isPromo && (
+                  <span className="text-xl text-gray-400 line-through">
+                    {t('common.currency')} {product.originalPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
+
+              {/* Order Message */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800 text-center font-medium">
+                  {t('order.order_message')}
+                </p>
+              </div>
+
+              {/* Order Form */}
+              <div className="space-y-4">
                 <OrderForm
                   inline={true}
                   initialItems={[{ product, quantity, selectedColor }]}
                 />
-              </CardContent>
-            </Card>
+              </div>
+
+              {/* Promo Badge */}
+              {product.promo && (
+                <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-3xl">🎁</div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-bold text-green-700">
+                        {t('product.buy_3_get_1')}
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Product Description - Section séparée */}
+        {product.description && product.description.trim() !== '' ? (
+          <div className="mt-8 w-full lg:w-1/4">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 text-gray-900 flex items-center gap-2">
+              <span className="text-2xl md:text-3xl">✨</span>
+              {t('product.description')}
+            </h2>
+            <div className="text-gray-800 leading-relaxed text-lg md:text-xl lg:text-2xl font-medium">
+              <p className={`whitespace-pre-line ${
+                !showFullDescription && product.description.length > 300 ? 'line-clamp-4' : ''
+              }`}>
+                {product.description}
+              </p>
+              {product.description.length > 300 && (
+                <button
+                  onClick={() => setShowFullDescription(!showFullDescription)}
+                  className="text-primary text-lg md:text-xl lg:text-2xl font-medium hover:underline mt-4 inline-block"
+                >
+                  {showFullDescription ? t('product.read_less') : t('product.read_more')}
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Si pas de description, afficher les 3 premières images verticalement */
+          productImages.length > 1 && (
+            <div className="mt-8 max-w-2xl">
+              <div className="space-y-4">
+                {productImages.slice(0, 3).map((image, index) => (
+                  <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div className="aspect-square relative">
+                      <img
+                        src={image}
+                        alt={`${product.name} - ${index + 1}`}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        )}
 
         {/* Similar Products Section */}
         {similarProducts.length > 0 && (
@@ -516,6 +436,8 @@ export default function ProductDetails() {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { FeaturesSection } from "@/components/FeaturesSection";
 import { ProductCard } from "@/components/ProductCard";
 import { Cart } from "@/components/Cart";
 import { Footer } from "@/components/Footer";
@@ -118,6 +119,9 @@ const Index = () => {
 
       <main className="flex-1">
         <Hero />
+        
+        {/* Features Section - Right after Hero */}
+        <FeaturesSection />
 
         <section id="products" className="py-16">
           <div className="container">
